@@ -135,6 +135,12 @@ export default function Tasks() {
     setTaskValue(e.target.value);
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleAddTask();
+    setTaskValue("");
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">
       <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-8 flex flex-col items-center justify-center space-y-4 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[100px] z-[6] relative">
@@ -188,24 +194,25 @@ export default function Tasks() {
           ))}
         </ul>
 
-        <fieldset className="text-xs md:grid grid-cols-3 gap-2 max-md:space-y-2">
-          <input
-            className="p-2 bg-white/20 rounded shadow-md col-span-2 w-full"
-            type="text"
-            name="title"
-            placeholder="Task title"
-            autoComplete="off"
-            onChange={(e) => handleChangeInput(e)}
-          />
-          <button
-            className="dark:bg-white dark:text-black bg-black text-white py-2 px-4 rounded-md w-full block"
-            type="button"
-            onClick={handleAddTask}
-            disabled={!taskValue}
-          >
-            Add task
-          </button>
-        </fieldset>
+        <form onSubmit={handleSubmit}>
+          <fieldset className="text-xs md:grid grid-cols-3 gap-2 max-md:space-y-2">
+            <input
+              className="p-2 bg-white/20 rounded shadow-md col-span-2 w-full"
+              type="text"
+              name="title"
+              placeholder="Task title"
+              autoComplete="off"
+              onChange={(e) => handleChangeInput(e)}
+            />
+            <button
+              className="dark:bg-white dark:text-black bg-black text-white py-2 px-4 rounded-md w-full block"
+              type="submit"
+              disabled={!taskValue}
+            >
+              Add task
+            </button>
+          </fieldset>
+        </form>
       </div>
     </div>
   );
