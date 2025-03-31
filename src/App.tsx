@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <img id="background" src={background} alt="background" />
-      <div className="min-h-[inherit] p-4 space-y-10 lg:grid lg:grid-cols-2 lg:gap-4">
+      <div className="min-h-[inherit] p-4 space-y-10 lg:grid lg:grid-cols-2 lg:gap-4 relative z-10">
         <Timer />
         <Tasks />
       </div>
