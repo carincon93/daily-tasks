@@ -45,3 +45,21 @@ button:hover {
   z-index: 0;
   filter: blur(100px);
 }
+
+.boxes-pattern {
+  opacity: 0.2;
+  background-image: linear-gradient(#9a9a9a68 1px, transparent 1px),
+    linear-gradient(to right, #9a9a9a68 1px, #efefef00 1px);
+  background-size: 20px 20px;
+}
+
+.rhombus-pattern {
+  opacity: 0.1;
+  background-image: linear-gradient(135deg, #d725ff68 25%, transparent 25%),
+    linear-gradient(225deg, #d725ff68 25%, transparent 25%),
+    linear-gradient(45deg, #d725ff68 25%, transparent 25%),
+    linear-gradient(315deg, #d725ff68 25%, #e5e5f700 25%);
+  background-position: 10px 0, 10px 0, 0 0, 0 0;
+  background-size: 10px 10px;
+  background-repeat: repeat;
+}
