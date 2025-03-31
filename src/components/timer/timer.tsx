@@ -33,7 +33,9 @@ export function Timer() {
 
   if (loading)
     return (
-      <div className="h-full flex items-center justify-center">Loading...</div>
+      <div className="h-full flex items-center justify-center min-h-[30dvh]">
+        Loading...
+      </div>
     );
 
   return (

@@ -13,7 +13,7 @@ function App() {
         fetchPriority="high"
       />
       <img
-        className="absolute inset-0 mx-auto opacity-30 top-[36%] lg:top-[20%] w-7/12 lg:w-4/12"
+        className="absolute inset-0 m-auto opacity-30 w-7/12 lg:w-4/12"
         src="./TaskList.webp"
         alt="TaskList"
       />
