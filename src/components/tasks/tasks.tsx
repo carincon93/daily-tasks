@@ -198,7 +198,7 @@ export default function Tasks() {
             onChange={(e) => handleChangeInput(e)}
           />
           <button
-            className="bg-black text-white py-2 px-4 rounded-md w-full block"
+            className="dark:bg-white dark:text-black bg-black text-white py-2 px-4 rounded-md w-full block"
             type="button"
             onClick={handleAddTask}
             disabled={!taskValue}
