@@ -165,7 +165,7 @@ export default function Tasks() {
                   {task.title}
                 </p>
               </button>
-              <div className="bg-white/30 absolute right-0 top-2 size-10 blur-md"></div>
+              <div className="bg-white/40 absolute right-2 top-1.5 size-8 blur-md"></div>
 
               <span className="text-xs absolute top-[24px] right-2">
                 {Math.floor(task.duration / 3600)}h{" "}

@@ -31,7 +31,10 @@ export function Timer() {
   const minutes = Number(((elapsedTime - 30) / 60).toFixed(0)) - 60 * hours;
   const seconds = elapsedTime ? (elapsedTime % 60).toString() : "00";
 
-  if (loading) return <div>Loading</div>;
+  if (loading)
+    return (
+      <div className="h-full flex items-center justify-center">Loading...</div>
+    );
 
   return (
     <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 max-lg:p-8 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[30dvh] h-full relative">
