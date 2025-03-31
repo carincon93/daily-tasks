@@ -145,7 +145,7 @@ export default function Tasks() {
 
       <div className="flex flex-col justify-between space-y-4">
         <ul
-          className="space-y-2  lg:h-[85dvh] overflow-y-scroll pr-2"
+          className="space-y-2 lg:h-[85dvh] overflow-y-scroll"
           style={{ scrollbarWidth: "none" }}
         >
           {tasks.map((task) => (
