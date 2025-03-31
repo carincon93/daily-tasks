@@ -34,7 +34,7 @@ export function Timer() {
   if (loading) return <div>Loading</div>;
 
   return (
-    <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 max-lg:p-8 rounded-2xl shadow-md border-x border-t border-gray-400 lg:h-full">
+    <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 max-lg:p-8 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[30dvh] h-full">
       {/* <h1 className="text-4xl">Stopwatch</h1> */}
       <TimerIcon className="size-12" />
 

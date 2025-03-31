@@ -175,14 +175,15 @@ export default function Tasks() {
                 className="absolute right-2 top-3"
               >
                 <Eraser size={20} />
+                {""}
               </button>
             </li>
           ))}
         </ul>
 
-        <fieldset className="text-xs grid grid-cols-3 gap-2">
+        <fieldset className="text-xs md:grid grid-cols-3 gap-2 max-md:space-y-2">
           <input
-            className="p-2 bg-white/20 rounded shadow-md col-span-2"
+            className="p-2 bg-white/20 rounded shadow-md col-span-2 w-full"
             type="text"
             name="title"
             placeholder="Task title"
