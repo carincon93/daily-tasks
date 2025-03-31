@@ -136,14 +136,16 @@ export default function Tasks() {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4 max-ld:h-[50dvh]">
+    <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">
       <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-8 flex flex-col items-center justify-center space-y-4 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[100px] z-[6]">
         {taskSelected && (
-          <p className="max-lg:rotate-270">{taskSelected.title}</p>
+          <p className="max-lg:rotate-270 leading-4.5 text-[15px]">
+            {taskSelected.title}
+          </p>
         )}
       </div>
 
-      <div className="flex flex-col justify-between space-y-4">
+      <div className="flex flex-col justify-between">
         <ul
           className="space-y-2 lg:h-[85dvh] overflow-y-scroll"
           style={{ scrollbarWidth: "none" }}
@@ -158,23 +160,25 @@ export default function Tasks() {
                 }  p-3.5 rounded-sm shadow-md border border-gray-400 min-h-[20px] mx-auto`}
                 onClick={() => handleTaskSelected(task)}
               >
-                <p>{task.title}</p>
-                <span className="mr-6">
-                  {Math.floor(task.duration / 3600)}h{" "}
-                  {Math.max(
-                    0,
-                    Number(((task.duration - 30) / 60).toFixed(0)) -
-                      60 * Math.floor(task.duration / 3600)
-                  )}
-                  m
-                </span>
+                <p className="max-md:text-[10px] text-left relative pr-7">{task.title}</p>
               </button>
+              <div className="bg-white/30 absolute right-0 top-2 size-10 blur-md"></div>
+
+              <span className="text-xs absolute top-[24px] right-2">
+                {Math.floor(task.duration / 3600)}h{" "}
+                {Math.max(
+                  0,
+                  Number(((task.duration - 30) / 60).toFixed(0)) -
+                    60 * Math.floor(task.duration / 3600)
+                )}
+                m
+              </span>
               <button
                 onClick={() => handleDeleteTask(task)}
                 type="button"
-                className="absolute right-2 top-3"
+                className="absolute right-2 top-1.5"
               >
-                <Eraser size={20} />
+                <Eraser size={18} />
                 {""}
               </button>
             </li>
