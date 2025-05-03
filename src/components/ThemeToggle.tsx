@@ -3,8 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
@@ -39,7 +37,9 @@ const ThemeToggle = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="z-20 fixed bottom-18 left-10">
-        <button className="bg-gray-950 text-white dark:bg-white p-2 rounded-md shadow-md flex items-center justify-center dark:text-black">{theme === "light" ? <Sun /> : <Moon />}</button>
+        <button className="bg-gray-950 text-white dark:bg-white p-2 rounded-md shadow-md flex items-center justify-center dark:text-black">
+          {theme === "light" ? <Sun /> : <Moon />}
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => toggleTheme("light")}>
