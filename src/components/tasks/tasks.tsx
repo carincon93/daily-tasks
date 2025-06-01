@@ -2,67 +2,15 @@ import { useTimerStore } from "@/store/index.store";
 import { Eraser } from "lucide-react";
 
 import { useEffect, useState } from "react";
-
-interface Task {
-  id: number;
-  title: string;
-  duration: number;
-}
-
-const DB_NAME = "TasksDB";
-const STORE_NAME = "tasks";
-const DB_VERSION = 1;
-
-const openDB = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-};
-
-const getTasks = async (): Promise<Task[]> => {
-  const db = await openDB();
-  return new Promise((resolve) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
-
-    request.onsuccess = () => resolve(request.result);
-  });
-};
-
-const addTask = async (task: Task) => {
-  const db = await openDB();
-  const transaction = db.transaction(STORE_NAME, "readwrite");
-  const store = transaction.objectStore(STORE_NAME);
-  store.add(task);
-};
-
-const updateTask = async (task: Task) => {
-  const db = await openDB();
-  const transaction = db.transaction(STORE_NAME, "readwrite");
-  const store = transaction.objectStore(STORE_NAME);
-  store.put(task);
-};
-
-const deleteTask = async (task: Task) => {
-  const db = await openDB();
-  const transaction = db.transaction(STORE_NAME, "readwrite");
-  const store = transaction.objectStore(STORE_NAME);
-  store.delete(task.id);
-};
+import { ChartAreaInteractive } from "../ChartArea";
+import { Task } from "@/lib/types";
+import {
+  addTask,
+  deleteTask,
+  getTasks,
+  updateTask,
+} from "@/services/tasks-indexed-db";
+import { fetchCategories } from "@/services/tasks-graphql";
 
 export default function Tasks() {
   const [taskSelected, setTaskSelected] = useState<Task | null>(null);
@@ -77,6 +25,8 @@ export default function Tasks() {
       setTaskSelected(taskInProcess ? JSON.parse(taskInProcess) : null);
     }
   }, []);
+
+  fetchCategories().then(console.log);
 
   const handleTaskSelected = (task: Task) => {
     if (taskSelected?.id !== task.id) {
@@ -143,13 +93,8 @@ export default function Tasks() {
 
   return (
     <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">
-      <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-8 flex flex-col items-center justify-center space-y-4 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[100px] z-[6] relative">
-        <div className="boxes-pattern absolute size-full"></div>
-        {taskSelected && (
-          <p className="max-lg:rotate-270 leading-4.5 text-[15px]">
-            {taskSelected.title}
-          </p>
-        )}
+      <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[100px] z-[6] relative">
+        <ChartAreaInteractive />
       </div>
 
       <div className="flex flex-col justify-between">
@@ -158,7 +103,7 @@ export default function Tasks() {
           style={{ scrollbarWidth: "none" }}
         >
           {tasks.map((task) => (
-            <li key={task.id} className="relative">
+            <li key={task.id} className="relative bg-white">
               <button
                 className={`flex items-center justify-between text-xs w-full ${
                   taskSelected?.id === task.id
@@ -197,7 +142,7 @@ export default function Tasks() {
         <form onSubmit={handleSubmit}>
           <fieldset className="text-xs md:grid grid-cols-3 gap-2 max-md:space-y-2">
             <input
-              className="p-2 bg-white/20 rounded shadow-md col-span-2 w-full"
+              className="p-2 bg-white text-black rounded shadow-md col-span-2 w-full"
               type="text"
               name="title"
               placeholder="Task title"

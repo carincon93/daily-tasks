@@ -31,3 +31,8 @@ button:hover {
   background-size: 10px 10px;
   background-repeat: repeat;
 }
+
+body[data-scroll-locked] {
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+}
