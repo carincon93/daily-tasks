@@ -3,8 +3,75 @@ import { Timer } from "./components/timer";
 import background from "/background.svg";
 import "./App.css";
 import ThemeToggle from "./components/ThemeToggle";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { createUser } from "./services/tasks-graphql";
+import { User } from "./lib/types";
+import Loading from "./components/Loader";
+import { useUserStore } from "./store/index.store";
+
+const DialogUser = () => {
+  const [openDialog, setOpenDialog] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const { setUserId } = useUserStore();
+
+  const handleCreateUser = async () => {
+    setLoading(true);
+    createUser()
+      .then((user: User) => {
+        setUserId(user.id);
+        const url = `/daily-tasks-app/${user.id}`;
+        window.location.assign(url);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  return (
+    <>
+      {loading ? (
+        <div className="flex items-center justify-center h-screen">
+          <Loading className="text-black dark:text-white" />
+        </div>
+      ) : (
+        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Create an user</AlertDialogTitle>
+              <AlertDialogDescription>
+                You don't have a user created yet. Please click the create
+                button to continue.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={handleCreateUser}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
+  );
+};
 
 function App() {
+  const { userId } = useUserStore();
+
+  if (!userId) {
+    return <DialogUser />;
+  }
+
   return (
     <>
       <ThemeToggle />

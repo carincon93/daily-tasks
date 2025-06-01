@@ -1,6 +1,7 @@
-import { useTimerStore } from "../../store/index.store";
+import { useTimerStore } from "@/store/index.store";
 import { Timer as TimerIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import Loading from "@/components/Loader";
 
 export function Timer() {
   const { startTime, running } = useTimerStore();
@@ -34,7 +35,7 @@ export function Timer() {
   if (loading)
     return (
       <div className="h-full flex items-center justify-center min-h-[30dvh]">
-        Loading...
+        <Loading className="text-black dark:text-white" />
       </div>
     );
 

@@ -151,7 +151,7 @@ export function ChartAreaInteractive() {
         onValueChange={(value) => setTimeRange(value as "90d" | "30d" | "7d")}
       >
         <SelectTrigger
-          className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
+          className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex bg-white"
           aria-label="Select a value"
         >
           <SelectValue placeholder="Last 3 months" />

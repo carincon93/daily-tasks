@@ -1,11 +1,17 @@
+import { User } from "@/lib/types";
 import { create } from "zustand";
 
-interface TimerStore {
+type TimerStore = {
   startTime: number | null;
   running: boolean;
   startTimer: () => void;
   stopTimer: () => void;
-}
+};
+
+type UserStore = {
+  userId: string | null;
+  setUserId: (userId: string | null) => void;
+};
 
 const getBrowserStorage = (key: string) => {
   if (typeof window !== "undefined") {
@@ -31,6 +37,14 @@ export const useTimerStore = create<TimerStore>((set) => ({
     }
     set({ startTime: null, running: false });
   },
+}));
+
+const pathParts = window.location.pathname.split("/");
+const lastPart = pathParts[pathParts.length - 1];
+
+export const useUserStore = create<UserStore>((set) => ({
+  userId: lastPart !== "" && lastPart !== "daily-tasks-app" ? lastPart : null,
+  setUserId: (userId: string | null) => set({ userId }),
 }));
 
 export const startTime = () => useTimerStore((state) => state.startTime);

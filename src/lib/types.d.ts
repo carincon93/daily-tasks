@@ -1,7 +1,18 @@
 type Task = {
   id: number;
-  title: string;
-  duration: number;
+  category_id: string;
+  user_id: string;
+  description: string;
+  milliseconds: number;
 };
 
-export type { Task };
+type User = {
+  id: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+}
+
+export type { User, Task, Category };

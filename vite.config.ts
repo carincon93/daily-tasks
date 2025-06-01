@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/daily-tasks/",
+  base: "/daily-tasks-app",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
