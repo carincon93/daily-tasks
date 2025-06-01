@@ -1,4 +1,3 @@
-import { User } from "@/lib/types";
 import { create } from "zustand";
 
 type TimerStore = {
