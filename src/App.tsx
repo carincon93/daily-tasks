@@ -31,7 +31,7 @@ const DialogUser = () => {
     createUser()
       .then((user: User) => {
         setUserId(user.id);
-        navigate(`/daily-tasks-app/${user.id}`);
+        navigate(`/${user.id}`);
       })
       .finally(() => {
         setLoading(false);
@@ -70,14 +70,11 @@ function App() {
   const { userId } = useUserStore();
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/daily-tasks-app">
       <Routes>
+        <Route path="/" element={<>{!userId && <DialogUser />}</>} />
         <Route
-          path="/daily-tasks-app"
-          element={<>{!userId && <DialogUser />}</>}
-        />
-        <Route
-          path="/daily-tasks-app/:id"
+          path="/:id"
           element={
             <>
               <ThemeToggle />
