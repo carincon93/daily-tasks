@@ -17,20 +17,21 @@ import { createUser } from "./services/tasks-graphql";
 import { User } from "./lib/types";
 import Loading from "./components/Loader";
 import { useUserStore } from "./store/index.store";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
 const DialogUser = () => {
   const [openDialog, setOpenDialog] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const { setUserId } = useUserStore();
+
+  const navigate = useNavigate();
 
   const handleCreateUser = async () => {
     setLoading(true);
     createUser()
       .then((user: User) => {
         setUserId(user.id);
-        const url = `/daily-tasks-app/${user.id}`;
-        window.location.assign(url);
+        navigate(`/daily-tasks-app/${user.id}`);
       })
       .finally(() => {
         setLoading(false);
@@ -68,27 +69,36 @@ const DialogUser = () => {
 function App() {
   const { userId } = useUserStore();
 
-  if (!userId) {
-    return <DialogUser />;
-  }
-
   return (
-    <>
-      <ThemeToggle />
-      <img
-        id="background"
-        src={background}
-        alt="background"
-        fetchPriority="high"
-      />
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/daily-tasks-app"
+          element={<>{!userId && <DialogUser />}</>}
+        />
+        <Route
+          path="/daily-tasks-app/:id"
+          element={
+            <>
+              <ThemeToggle />
+              <img
+                id="background"
+                src={background}
+                alt="background"
+                fetchPriority="high"
+              />
 
-      <div className="min-h-[inherit] p-4 space-y-10 lg:grid lg:grid-cols-2 lg:gap-4 relative z-10 dark:text-white">
-        <div className="boxes-pattern absolute size-full inset-0 -z-1"></div>
+              <div className="min-h-[inherit] p-4 space-y-10 lg:grid lg:grid-cols-2 lg:gap-4 relative z-10 dark:text-white">
+                <div className="boxes-pattern absolute size-full inset-0 -z-1"></div>
 
-        <Timer />
-        <Tasks />
-      </div>
-    </>
+                <Timer />
+                <Tasks />
+              </div>
+            </>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
