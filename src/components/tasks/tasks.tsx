@@ -2,7 +2,7 @@ import { useTimerStore, useUserStore } from "@/store/index.store";
 import { Eraser } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { ChartAreaInteractive, description } from "@/components/ChartArea";
+import { ChartAreaInteractive } from "@/components/ChartArea";
 import { Category, Task } from "@/lib/types";
 
 import {
@@ -29,7 +29,7 @@ function Tasks() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categorySelected, setCategorySelected] = useState<Partial<Category>>();
 
-  const { startTime, startTimer, stopTimer } = useTimerStore();
+  const { startTime, startTimer } = useTimerStore();
   const { userId } = useUserStore();
 
   const handleTaskSelected = (task: Task) => {
