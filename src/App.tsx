@@ -18,11 +18,13 @@ import { User } from "./lib/types";
 import Loading from "./components/Loader";
 import { useUserStore } from "./store/index.store";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { Input } from "./components/ui/input";
+import { Button } from "./components/ui/button";
 
 const DialogUser = () => {
   const [openDialog, setOpenDialog] = useState(true);
   const [loading, setLoading] = useState(false);
-  const { setUserId } = useUserStore();
+  const { setUserId, userId } = useUserStore();
 
   const navigate = useNavigate();
 
@@ -50,13 +52,31 @@ const DialogUser = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Create an user</AlertDialogTitle>
               <AlertDialogDescription>
-                You don't have a user created yet. Please click the create
-                button to continue.
+                If you do not yet have a username. Please click on the create
+                user button to continue or if you already have a user enter the
+                user code.
               </AlertDialogDescription>
+              <div className="flex items-center justify-center gap-2">
+                <Input
+                  placeholder="Enter your user code"
+                  onChange={(e) => setUserId(e.target.value)}
+                />
+                <Button
+                  onClick={() => navigate(`/${userId}`)}
+                  disabled={!userId}
+                >
+                  Go
+                </Button>
+              </div>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={handleCreateUser}>
-                Continue
+
+            <AlertDialogFooter className="flex items-center gap-4">
+              <span className="text-gray-600">- or -</span>
+              <AlertDialogAction
+                onClick={handleCreateUser}
+                disabled={Boolean(userId)}
+              >
+                Create user
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -67,12 +87,10 @@ const DialogUser = () => {
 };
 
 function App() {
-  const { userId } = useUserStore();
-
   return (
     <BrowserRouter basename="/daily-tasks-app">
       <Routes>
-        <Route path="/" element={<>{!userId && <DialogUser />}</>} />
+        <Route path="/" element={<DialogUser />} />
         <Route
           path="/:id"
           element={

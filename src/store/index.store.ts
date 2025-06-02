@@ -3,7 +3,7 @@ import { create } from "zustand";
 type TimerStore = {
   startTime: number | null;
   running: boolean;
-  startTimer: () => void;
+  startTimer: (taskMilliseconds: number) => void;
   stopTimer: () => void;
 };
 
@@ -23,8 +23,8 @@ const getBrowserStorage = (key: string) => {
 export const useTimerStore = create<TimerStore>((set) => ({
   startTime: Number(getBrowserStorage("startTime")) || null,
   running: Boolean(getBrowserStorage("startTime")),
-  startTimer: () => {
-    const now = Date.now();
+  startTimer: (taskMilliseconds: number = 0) => {
+    const now = Date.now() - taskMilliseconds;
     if (typeof window !== "undefined") {
       window.localStorage.setItem("startTime", now.toString());
     }
@@ -48,5 +48,6 @@ export const useUserStore = create<UserStore>((set) => ({
 
 export const startTime = () => useTimerStore((state) => state.startTime);
 export const running = () => useTimerStore((state) => state.running);
-export const startTimer = () => useTimerStore.getState().startTimer();
+export const startTimer = (taskMilliseconds: number) =>
+  useTimerStore.getState().startTimer(taskMilliseconds);
 export const stopTimer = () => useTimerStore.getState().stopTimer();

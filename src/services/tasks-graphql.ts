@@ -67,6 +67,66 @@ const createTask = async (task: Partial<Task>): Promise<Task> => {
   return result.data.insert_tasks_one;
 };
 
+const findTask = async (task: Partial<Task>): Promise<Task> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+        query get_task_by_pk($id: uuid!) {
+          tasks(where: {id: {_eq: $id}}, limit: 1) {
+            milliseconds
+          }
+        }
+      `,
+      variables: {
+        id: task.id,
+      },
+    }),
+  });
+
+  const result = await response.json();
+
+  return result.data.tasks[0];
+};
+
+const updateTask = async (
+  task: Partial<Task>,
+  newMilliseconds: number
+): Promise<Task> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation update_single_task($id: uuid!, $milliseconds: bigint) {
+          update_tasks_by_pk(pk_columns: {id: $id}, _set: {milliseconds: $milliseconds}) {
+            id
+            category_id
+            user_id
+            description
+            milliseconds
+          }
+        }
+      `,
+      variables: {
+        id: task.id,
+        milliseconds: newMilliseconds,
+      },
+    }),
+  });
+
+  const result = await response.json();
+
+  return result.data.update_tasks_by_pk;
+};
+
 const deleteTask = async (task: Partial<Task>): Promise<Task> => {
   const response = await fetch(API_URL, {
     method: "POST",
@@ -140,4 +200,12 @@ const createUser = async (): Promise<User> => {
   return result.data.insert_users_one;
 };
 
-export { fetchCategories, fetchTasks, createTask, deleteTask, createUser };
+export {
+  fetchCategories,
+  fetchTasks,
+  createTask,
+  findTask,
+  updateTask,
+  deleteTask,
+  createUser,
+};

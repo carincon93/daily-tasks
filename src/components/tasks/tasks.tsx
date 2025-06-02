@@ -2,7 +2,7 @@ import { useTimerStore, useUserStore } from "@/store/index.store";
 import { Eraser } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { ChartAreaInteractive } from "@/components/ChartArea";
+import { ChartAreaInteractive, description } from "@/components/ChartArea";
 import { Category, Task } from "@/lib/types";
 
 import {
@@ -10,6 +10,7 @@ import {
   deleteTask,
   fetchCategories,
   fetchTasks,
+  updateTask,
 } from "@/services/tasks-graphql";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,39 +32,26 @@ function Tasks() {
   const { startTime, startTimer, stopTimer } = useTimerStore();
   const { userId } = useUserStore();
 
-  useEffect(() => {
-    if (!userId) return;
-
-    if (typeof window !== "undefined") {
-      const taskInProcess = window.localStorage.getItem("taskInProcess");
-      setTaskSelected(taskInProcess ? JSON.parse(taskInProcess) : null);
-    }
-    fetchTasks(userId).then(setTasks);
-    fetchCategories().then(setCategories);
-  }, []);
-
   const handleTaskSelected = (task: Task) => {
+    if (!task || !startTime || taskSelected?.id === task.id) return;
+
     if (taskSelected?.id !== task.id) {
       handleUpdateTask();
     }
+
+    startTimer(task.milliseconds);
+    setTaskSelected(task);
 
     if (typeof window !== "undefined") {
       window.localStorage.setItem(
         "taskInProcess",
         JSON.stringify({
           id: task.id,
-          title: task.description,
-          time: Date.now(),
+          description: task.description,
+          milliseconds: task.milliseconds,
         })
       );
     }
-
-    setTaskSelected(task);
-    stopTimer();
-
-    setTimeout(() => {
-      startTimer();
-    }, 500);
   };
 
   const handleAddTask = async () => {
@@ -80,14 +68,22 @@ function Tasks() {
   };
 
   const handleUpdateTask = async () => {
-    if (!taskSelected || !startTime) return;
-    const updatedTask: Task = {
-      ...taskSelected,
-      description: `${taskSelected.description}`,
-      milliseconds: (Date.now() - startTime) / 1000,
-    };
-    // await updateTask(updatedTask);
-    setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    if (!taskSelected || !startTime || !userId) return;
+
+    const newTaskMs = Date.now()  - startTime;
+
+    updateTask(taskSelected, newTaskMs).then(() =>
+      setTasks((prevTasks) => {
+        const updatedTasks = prevTasks
+          .sort((a, b) => b.milliseconds - a.milliseconds)
+          .map((prevTask) =>
+            prevTask.id === taskSelected.id
+              ? { ...prevTask, milliseconds: newTaskMs }
+              : prevTask
+          );
+        return updatedTasks;
+      })
+    );
   };
 
   const handleDeleteTask = async (task: Task) => {
@@ -104,7 +100,31 @@ function Tasks() {
     e.preventDefault();
     handleAddTask();
     setTaskValue("");
+    setCategorySelected({ id: undefined });
   };
+
+  const calculateTaskTime = (task: Task) => {
+    const msAcumulated = task.milliseconds;
+
+    const totalMinutes = Math.floor(msAcumulated / (1000 * 60)); // → 5 minutos
+    const hours = Math.floor(totalMinutes / 60); // → 0
+    const minutes = totalMinutes % 60; // → 5
+
+    return `${hours.toString().padStart(2, "0")}hr ${minutes
+      .toString()
+      .padStart(2, "0")}min`;
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+
+    if (typeof window !== "undefined") {
+      const taskInProcess = window.localStorage.getItem("taskInProcess");
+      setTaskSelected(taskInProcess ? JSON.parse(taskInProcess) : null);
+    }
+    fetchTasks(userId).then(setTasks);
+    fetchCategories().then(setCategories);
+  }, []);
 
   return (
     <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">
@@ -118,41 +138,38 @@ function Tasks() {
           style={{ scrollbarWidth: "none" }}
         >
           {tasks &&
-            tasks.map((task) => (
-              <li key={task.id} className="relative bg-white">
-                <button
-                  className={`flex items-center justify-between text-xs w-full ${
-                    taskSelected?.id === task.id
-                      ? "bg-green-200/20"
-                      : "bg-white/20"
-                  }  p-3.5 rounded-sm shadow-md border min-h-[20px] mx-auto`}
-                  onClick={() => handleTaskSelected(task)}
-                >
-                  <p className="max-md:text-[10px] text-left relative pr-7">
-                    {task.description}
-                  </p>
-                </button>
-                <div className="bg-white/40 absolute right-2 top-1.5 size-8 blur-md"></div>
+            tasks
+              .sort((a, b) => b.milliseconds - a.milliseconds)
+              .map((task) => (
+                <li key={task.id} className="relative bg-white">
+                  <button
+                    className={`flex items-center justify-between text-xs w-full ${
+                      taskSelected?.id === task.id
+                        ? "bg-green-200/20"
+                        : "bg-white/20"
+                    }  p-3.5 rounded-sm shadow-md border min-h-[20px] mx-auto`}
+                    onClick={() => handleTaskSelected(task)}
+                    disabled={taskSelected?.id === task.id}
+                  >
+                    <p className="max-md:text-[10px] text-left relative pr-7">
+                      {task.description}
+                    </p>
+                  </button>
+                  <div className="bg-white/40 absolute right-2 top-1.5 size-8 blur-md"></div>
 
-                <span className="text-xs absolute top-[24px] right-2">
-                  {Math.floor(task.milliseconds / 3600)}h{" "}
-                  {Math.max(
-                    0,
-                    Number(((task.milliseconds - 30) / 60).toFixed(0)) -
-                      60 * Math.floor(task.milliseconds / 3600)
-                  )}
-                  m
-                </span>
-                <button
-                  onClick={() => handleDeleteTask(task)}
-                  type="button"
-                  className="absolute right-2 top-1.5"
-                >
-                  <Eraser size={18} />
-                  {""}
-                </button>
-              </li>
-            ))}
+                  <span className="text-xs absolute top-[24px] right-2">
+                    {calculateTaskTime(task) || "00hr 00min"}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteTask(task)}
+                    type="button"
+                    className="absolute right-2 top-1.5"
+                  >
+                    <Eraser size={18} />
+                    {""}
+                  </button>
+                </li>
+              ))}
         </ul>
 
         <form onSubmit={handleSubmit}>
@@ -164,6 +181,7 @@ function Tasks() {
               placeholder="Task title"
               autoComplete="off"
               onChange={(e) => handleChangeInput(e)}
+              value={taskValue}
             />
 
             <Select
@@ -186,7 +204,7 @@ function Tasks() {
               </SelectContent>
             </Select>
 
-            <Button type="submit" disabled={!taskValue}>
+            <Button type="submit" disabled={!taskValue || !categorySelected}>
               Add task
             </Button>
           </div>
