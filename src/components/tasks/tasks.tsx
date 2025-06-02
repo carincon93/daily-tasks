@@ -70,7 +70,7 @@ function Tasks() {
   const handleUpdateTask = async () => {
     if (!taskSelected || !startTime || !userId) return;
 
-    const newTaskMs = Date.now()  - startTime;
+    const newTaskMs = Date.now() - startTime;
 
     updateTask(taskSelected, newTaskMs).then(() =>
       setTasks((prevTasks) => {
@@ -104,9 +104,9 @@ function Tasks() {
   };
 
   const calculateTaskTime = (task: Task) => {
-    const msAcumulated = task.milliseconds;
+    const msAccumulated = task.milliseconds;
 
-    const totalMinutes = Math.floor(msAcumulated / (1000 * 60)); // → 5 minutos
+    const totalMinutes = Math.floor(msAccumulated / (1000 * 60)); // → 5 minutos
     const hours = Math.floor(totalMinutes / 60); // → 0
     const minutes = totalMinutes % 60; // → 5
 
