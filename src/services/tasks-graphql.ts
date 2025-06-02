@@ -15,7 +15,9 @@ const fetchTasks = async (user_id: string): Promise<Task[]> => {
           query get_tasks_by_user($user_id: uuid!) {
             tasks(where: {user_id: {_eq: $user_id}}) {
               id
-              category_id
+              category {
+                name
+              }
               user_id
               description
               milliseconds
@@ -108,7 +110,9 @@ const updateTask = async (
         mutation update_single_task($id: uuid!, $milliseconds: bigint) {
           update_tasks_by_pk(pk_columns: {id: $id}, _set: {milliseconds: $milliseconds}) {
             id
-            category_id
+            category {
+              name
+            }
             user_id
             description
             milliseconds

@@ -111,6 +111,7 @@ const chartData = [
   { date: "2024-06-28", desktop: 149, mobile: 200 },
   { date: "2024-06-29", desktop: 103, mobile: 160 },
   { date: "2024-06-30", desktop: 446, mobile: 400 },
+  { date: "2024-07-01", desktop: 46, mobile: 350 },
 ];
 
 const chartConfig = {
@@ -132,17 +133,23 @@ export function ChartAreaInteractive() {
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
-    const referenceDate = new Date("2024-06-30");
-    let daysToSubtract = 90;
+    const endDate = new Date("2024-07-01");
+    let daysToSubtract = 7;
+
     if (timeRange === "30d") {
       daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
+    } else if (timeRange === "90d") {
+      daysToSubtract = 90;
     }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - daysToSubtract);
+
+    return date >= startDate && date <= endDate;
+    });
+
+
+  console.log(filteredData);
 
   return (
     <>
@@ -207,8 +214,11 @@ export function ChartAreaInteractive() {
             axisLine={false}
             tickMargin={8}
             minTickGap={32}
+            interval="preserveStartEnd"
             tickFormatter={(value) => {
               const date = new Date(value);
+              date.setDate(date.getDate() + 1);
+
               return date.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -220,7 +230,10 @@ export function ChartAreaInteractive() {
             content={
               <ChartTooltipContent
                 labelFormatter={(value) => {
-                  return new Date(value).toLocaleDateString("en-US", {
+                  const date = new Date(value);
+                  date.setDate(date.getDate() + 1);
+
+                  return date.toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   });
