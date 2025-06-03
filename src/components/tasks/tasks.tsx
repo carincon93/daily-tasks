@@ -270,7 +270,7 @@ function Tasks() {
             </AlertDialogDescription>
             <div className="flex items-center justify-center gap-2">
               <Input
-                placeholder="Enter your user code"
+                placeholder="Enter the category name"
                 onChange={(e) => setCategoryValue(e.target.value)}
               />
             </div>
