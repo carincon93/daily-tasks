@@ -217,7 +217,7 @@ function Tasks() {
   }, []);
 
   useEffect(() => {
-    if (!categorySelected) return;
+    if (!categorySelected || categorySelected && categorySelected.name !== "new") return;
 
     setOpenCategoryDialog(true);
   }, [categorySelected]);
