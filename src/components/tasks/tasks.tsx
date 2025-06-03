@@ -34,7 +34,7 @@ function Tasks() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categorySelected, setCategorySelected] = useState<Partial<Category>>();
 
-  const { startTime, endOfDay, startTimer } = useTimerStore();
+  const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
   const { currentDate } = getCurrentDate();
 
@@ -75,23 +75,8 @@ function Tasks() {
       handleUpdateTask();
     }
 
-    startTimer(task.milliseconds);
+    startTimer(task);
     setTaskSelected(task);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "taskInProcess",
-        JSON.stringify({
-          id: task.id,
-          category_id: task.category_id,
-          user_id: task.user_id,
-          description: task.description,
-          milliseconds: task.milliseconds,
-          date: task.date,
-          is_visible: task.is_visible,
-        })
-      );
-    }
   };
 
   const handleCloneTask = async (task: Task) => {
@@ -199,43 +184,40 @@ function Tasks() {
 
     fetchTasks(userId).then(setTasks);
     fetchCategories().then(setCategories);
+  }, []);
 
-    if (typeof window !== "undefined") {
-      const taskInProcess = window.localStorage.getItem("taskInProcess");
+  useEffect(() => {
+    if (!taskInProcess) return;
 
-      if (!taskInProcess) return;
+    setTaskSelected(taskInProcess ?? null);
 
-      const taskInProcessParsed = JSON.parse(taskInProcess) as Task;
-      setTaskSelected(taskInProcessParsed ?? null);
+    if (taskInProcess.date !== currentDate) {
+      if (!endOfDay || !startTime) return;
 
-      if (taskInProcessParsed.date !== currentDate) {
+      if (Date.now() > endOfDay) {
         stopTimer();
 
-        if (!endOfDay || !startTime) return;
+        const taskToUpdate: Partial<Task> = {
+          id: taskInProcess.id,
+          milliseconds: endOfDay - startTime,
+          is_visible: taskInProcess.is_visible,
+        };
 
-        if (Date.now() > endOfDay) {
-          const taskToUpdate: Partial<Task> = {
-            id: taskInProcessParsed.id,
-            milliseconds: endOfDay - startTime,
-            is_visible: taskInProcessParsed.is_visible,
-          };
-
-          updateTask(taskToUpdate).then(() =>
-            setTasks((prevTasks) => {
-              const updatedTasks = prevTasks
-                .sort((a, b) => b.milliseconds - a.milliseconds)
-                .map((prevTask) =>
-                  prevTask.id === taskInProcessParsed.id
-                    ? { ...prevTask, milliseconds: endOfDay - startTime }
-                    : prevTask
-                );
-              return updatedTasks;
-            })
-          );
-        }
+        updateTask(taskToUpdate).then(() =>
+          setTasks((prevTasks) => {
+            const updatedTasks = prevTasks
+              .sort((a, b) => b.milliseconds - a.milliseconds)
+              .map((prevTask) =>
+                prevTask.id === taskInProcess.id
+                  ? { ...prevTask, milliseconds: endOfDay - startTime }
+                  : prevTask
+              );
+            return updatedTasks;
+          })
+        );
       }
     }
-  }, []);
+  }, [taskInProcess]);
 
   return (
     <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">

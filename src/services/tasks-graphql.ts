@@ -1,4 +1,4 @@
-import { Category, Task, User } from "@/lib/types";
+import { Category, Session, Task, User } from "@/lib/types";
 
 const API_URL = import.meta.env.VITE_HASURA_GRAPHQL_URL;
 const HASURA_ADMIN_SECRET = import.meta.env.VITE_HASURA_ADMIN_SECRET;
@@ -216,6 +216,97 @@ const createUser = async (): Promise<User> => {
   return result.data.insert_users_one;
 };
 
+const fetchSession = async (): Promise<Session> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+          query get_session {
+            session(limit: 1) {
+              id
+              start_time
+              task_in_process
+              end_of_day
+            }
+          }
+        `,
+      variables: {},
+    }),
+  });
+
+  const result = await response.json();
+  return result.data.session[0];
+};
+
+const createSession = async (session: Partial<Session>): Promise<Session> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation insert_single_session($object: session_insert_input!) {
+          insert_session_one(object: $object) {
+            end_of_day
+            id
+            start_time
+            task_in_process
+          }
+        }
+      `,
+      variables: {
+        object: {
+          start_time: session.start_time,
+          end_of_day: session.end_of_day,
+          task_in_process: session.task_in_process || null,
+        },
+      },
+    }),
+  });
+
+  const result = await response.json();
+
+  return result.data.insert_session_one;
+};
+
+const updateSession = async (session: Partial<Session>): Promise<Session> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation update_single_session($id: uuid!, $start_time: bigint, $end_of_day: bigint, $task_in_process: jsonb = null) {
+          update_session_by_pk(pk_columns: {id: $id}, _set: {start_time: $start_time, end_of_day: $end_of_day, task_in_process: $task_in_process}) {
+            id
+            end_of_day 
+            start_time
+            task_in_process
+          }
+        }
+      `,
+      variables: {
+        id: session.id,
+        start_time: session.start_time,
+        end_of_day: session.end_of_day,
+        task_in_process: session.task_in_process || null,
+      },
+    }),
+  });
+
+  const result = await response.json();
+
+  return result.data.update_session_by_pk;
+};
+
 export {
   fetchCategories,
   fetchTasks,
@@ -224,4 +315,7 @@ export {
   updateTask,
   deleteTask,
   createUser,
+  fetchSession,
+  createSession,
+  updateSession,
 };

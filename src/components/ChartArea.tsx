@@ -40,6 +40,8 @@ export function ChartAreaInteractive({
   const [timeRange, setTimeRange] = useState<TimeRange>("7d");
   const { currentDate } = getCurrentDate();
 
+  chartData.sort((a, b) => a.date.localeCompare(b.date));
+
   const chartConfig = categories.reduce((config, category, index) => {
     return {
       ...config,

@@ -1,10 +1,18 @@
+import { Session, Task } from "@/lib/types";
+import {
+  createSession,
+  fetchSession,
+  updateSession,
+} from "@/services/tasks-graphql";
 import { create } from "zustand";
 
 type TimerStore = {
+  sessionId: string;
   startTime: number | null;
   endOfDay: number | null;
+  taskInProcess: Task | null;
   running: boolean;
-  startTimer: (taskMilliseconds: number) => void;
+  startTimer: (task: Task) => void;
   stopTimer: () => void;
 };
 
@@ -18,68 +26,106 @@ type GetCurrentDateStore = {
   setCurrentDate: (currentDate: string) => void;
 };
 
-const getBrowserStorage = (key: string) => {
-  if (typeof window !== "undefined") {
-    return window.localStorage.getItem(key);
-  }
-  return null;
+const getSession = async () => {
+  return await fetchSession();
 };
 
-// const removeItemBrowserStorage = (key: string) => {
-//   if (typeof window !== "undefined") {
-//     return window.localStorage.removeItem(key);
-//   }
+const endOfDayUtc5 = (timestamp: number) => {
+  // Convertir a fecha en UTC-5 (Bogotá)
+  const date = new Date(timestamp);
 
-//   return null;
-// };
+  // Extraer componentes en la zona horaria de Bogotá
+  const utc5Time = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const year = Number(utc5Time.find((p) => p.type === "year")?.value ?? "0");
+  const month =
+    Number(utc5Time.find((p) => p.type === "month")?.value ?? "1") - 1; // JS months are 0-indexed
+  const day = Number(utc5Time.find((p) => p.type === "day")?.value ?? "1");
+
+  // Crear nueva fecha a las 23:59:59.999 en UTC-5
+  return new Date(Date.UTC(year, month, day, 23 + 5, 59, 59, 999));
+};
 
 // Global state with Zustand
-export const useTimerStore = create<TimerStore>((set) => ({
-  startTime: Number(getBrowserStorage("startTime")) || null,
-  endOfDay: Number(getBrowserStorage("endOfDay")) || null,
-  running: Boolean(getBrowserStorage("startTime")),
-  startTimer: (taskMilliseconds: number = 0) => {
-    const now = Date.now() - taskMilliseconds;
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("startTime", now.toString());
+export const useTimerStore = create<TimerStore>((set) => {
+  // Initialize store
+  getSession().then((session) => {
+    if (session?.id) {
+      set({ sessionId: session.id });
     }
-    set({ startTime: now, running: true });
-  },
-  stopTimer: () => {
-    // Convertir a fecha en UTC-5 (Bogotá)
-    const date = new Date(Number(getBrowserStorage("startTime")));
 
-    // Extraer componentes en la zona horaria de Bogotá
-    const bogotaTime = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Bogota",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).formatToParts(date);
+    if (session?.start_time) {
+      set({ startTime: session.start_time, running: true });
+    }
 
-    const year = Number(
-      bogotaTime.find((p) => p.type === "year")?.value ?? "0"
-    );
-    const month =
-      Number(bogotaTime.find((p) => p.type === "month")?.value ?? "1") - 1; // JS months are 0-indexed
-    const day = Number(bogotaTime.find((p) => p.type === "day")?.value ?? "1");
+    if (session?.end_of_day) {
+      set({ endOfDay: session.end_of_day });
+    }
 
-    // Crear nueva fecha a las 23:59:59.999 en UTC-5
-    const endOfDayBogota = new Date(
-      Date.UTC(year, month, day, 23 + 5, 59, 59, 999)
-    );
-    window.localStorage.setItem(
-      "endOfDay",
-      endOfDayBogota.getTime().toString()
-    );
+    if (session?.task_in_process) {
+      set({ taskInProcess: session.task_in_process });
+    }
+  });
 
-    // removeItemBrowserStorage("startTime");
-    // removeItemBrowserStorage("endOfDay");
-    // removeItemBrowserStorage("taskInProcess");
+  return {
+    sessionId: "",
+    startTime: null,
+    endOfDay: null,
+    taskInProcess: null,
+    running: false,
+    startTimer: async (task: Task) => {
+      const session = await getSession();
 
-    set({ startTime: null, endOfDay: null, running: false });
-  },
-}));
+      const now = Date.now();
+
+      const endOfDay = endOfDayUtc5(now).getTime().toString();
+
+      if (!session) {
+        const newSession: Partial<Session> = {
+          start_time: now,
+          end_of_day: Number(endOfDay),
+          task_in_process: task,
+        };
+
+        createSession(newSession);
+      }
+
+      const sessionToUpdate: Partial<Session> = {
+        id: session.id,
+        start_time: now,
+        end_of_day: Number(endOfDay),
+        task_in_process: task,
+      };
+
+      updateSession(sessionToUpdate);
+
+      const startTimeCalc = now - task.milliseconds;
+
+      set({ startTime: startTimeCalc, running: true });
+    },
+    stopTimer: async () => {
+      const session = await getSession();
+
+      const endOfDay = endOfDayUtc5(session.start_time).getTime().toString();
+
+      const sessionToUpdate: Partial<Session> = {
+        id: session.id,
+        start_time: session.start_time,
+        end_of_day: Number(endOfDay),
+        task_in_process: null,
+      };
+
+      updateSession(sessionToUpdate);
+
+      set({ startTime: null, endOfDay: null, running: false });
+    },
+  };
+});
 
 export const getCurrentDate = create<GetCurrentDateStore>((set) => ({
   currentDate: new Date(new Date().getTime() - 5 * 60 * 60 * 1000)
@@ -96,9 +142,12 @@ export const useUserStore = create<UserStore>((set) => ({
   setUserId: (userId: string | null) => set({ userId }),
 }));
 
+export const sessionId = () => useTimerStore((state) => state.sessionId);
 export const startTime = () => useTimerStore((state) => state.startTime);
 export const endOfDay = () => useTimerStore((state) => state.endOfDay);
+export const taskInProcess = () =>
+  useTimerStore((state) => state.taskInProcess);
 export const running = () => useTimerStore((state) => state.running);
-export const startTimer = (taskMilliseconds: number) =>
-  useTimerStore.getState().startTimer(taskMilliseconds);
+export const startTimer = (task: Task) =>
+  useTimerStore.getState().startTimer(task);
 export const stopTimer = () => useTimerStore.getState().stopTimer();

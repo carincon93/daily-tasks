@@ -18,4 +18,11 @@ type Category = {
   name: string;
 };
 
-export type { User, Task, Category };
+type Session = {
+  id: string;
+  start_time: number;
+  end_of_day: number;
+  task_in_process: Task | null;
+}
+
+export type { User, Task, Category, Session };
