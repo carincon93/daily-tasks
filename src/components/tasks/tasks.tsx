@@ -220,17 +220,17 @@ function Tasks() {
   }, [taskInProcess]);
 
   return (
-    <div className="grid grid-cols-2 gap-4 min-h-[60dvh]">
-      <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[100px] z-[6] relative">
+    <div className="md:grid grid-cols-2 gap-4 min-h-[60dvh]">
+      <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
         <ChartAreaInteractive
           chartData={groupedTasksByCategory()}
           categories={categories}
         />
       </div>
 
-      <div className="flex flex-col justify-between">
+      <div className="flex flex-col justify-between mt-4 md:mt-0">
         <ul
-          className="space-y-2 lg:h-[85dvh] overflow-y-scroll"
+          className="space-y-2 h-[150px] overflow-y-auto md:h-full"
           style={{ scrollbarWidth: "none" }}
         >
           {tasks &&
@@ -238,58 +238,56 @@ function Tasks() {
               .filter((task) => task.is_visible)
               .sort((a, b) => b.milliseconds - a.milliseconds)
               .map((task) => (
-                <li
-                  key={task.id}
-                  className={`relative bg-white p-3.5 rounded-sm shadow-md  ${
-                    currentDate === task.date
-                      ? "border-l-2 border-green-500"
-                      : "opacity-50"
-                  }`}
-                >
+                <li key={task.id} className="relative">
                   <button
-                    className={`flex items-center justify-between text-xs w-full ${
-                      taskSelected?.id === task.id
-                        ? "bg-green-200/20"
-                        : "bg-white/20"
-                    }  min-h-[20px] mx-auto`}
+                    className={`flex w-full p-3.5 rounded-sm shadow-md text-xs
+                      ${currentDate !== task.date ? "opacity-50" : ""}
+                      ${
+                        taskSelected?.id === task.id
+                          ? "bg-green-200"
+                          : "bg-white"
+                      }
+                      `}
                     onClick={() => handleTaskSelected(task)}
                     disabled={taskSelected?.id === task.id}
                   >
-                    <p className="max-md:text-[10px] text-left relative pr-7">
-                      {task.description}
-                    </p>
+                    <p className="text-left pr-7">{task.description}</p>
                   </button>
 
-                  <span className="text-xs absolute top-[24px] right-2">
-                    {calculateTaskTime(task) || "00hr 00min"}
-                  </span>
-                  {currentDate !== task.date && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleCloneTask(task);
-                      }}
-                    >
-                      <RefreshCcw size={16} />
-                      {""}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleDeleteTask(task)}
-                    type="button"
-                    className="absolute right-2 top-1.5"
-                  >
-                    <Eraser size={18} />
-                    {""}
-                  </button>
+                  <div className="absolute right-2 top-0.5">
+                    <div className="flex items-center gap-2">
+                      {currentDate !== task.date && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleCloneTask(task);
+                          }}
+                        >
+                          <RefreshCcw size={16} />
+                          {""}
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleDeleteTask(task)}
+                        type="button"
+                      >
+                        <Eraser size={18} />
+                        {""}
+                      </button>
+                    </div>
+                    <span className="text-xs">
+                      {calculateTaskTime(task) || "00hr 00min"}
+                    </span>
+                  </div>
                 </li>
               ))}
         </ul>
 
-        <form onSubmit={handleSubmit}>
-          <div className="text-xs md:grid grid-cols-4 gap-2 max-md:space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-2 mt-4 md:mt-0">
+          <div className="text-xs grid grid-cols-2 gap-2">
             <Input
-              className="col-span-2 bg-white text-black w-full"
+              className=" bg-white text-black w-full"
               type="text"
               name="title"
               placeholder="Task title"
@@ -317,11 +315,15 @@ function Tasks() {
                 ))}
               </SelectContent>
             </Select>
-
-            <Button type="submit" disabled={!taskValue || !categorySelected}>
-              Add task
-            </Button>
           </div>
+
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={!taskValue || !categorySelected}
+          >
+            Add task
+          </Button>
         </form>
       </div>
     </div>
