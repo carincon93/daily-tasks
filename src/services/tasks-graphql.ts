@@ -15,12 +15,15 @@ const fetchTasks = async (user_id: string): Promise<Task[]> => {
           query get_tasks_by_user($user_id: uuid!) {
             tasks(where: {user_id: {_eq: $user_id}}) {
               id
+              category_id
               category {
                 name
               }
               user_id
               description
               milliseconds
+              date
+              is_visible
             }
           }
         `,
@@ -50,6 +53,8 @@ const createTask = async (task: Partial<Task>): Promise<Task> => {
             user_id
             description
             milliseconds
+            date
+            is_visible
           }
         }
       `,
@@ -59,6 +64,10 @@ const createTask = async (task: Partial<Task>): Promise<Task> => {
           user_id: task.user_id,
           description: task.description,
           milliseconds: 0,
+          date: new Date(new Date().getTime() - 5 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0],
+          is_visible: true,
         },
       },
     }),
@@ -95,10 +104,7 @@ const findTask = async (task: Partial<Task>): Promise<Task> => {
   return result.data.tasks[0];
 };
 
-const updateTask = async (
-  task: Partial<Task>,
-  newMilliseconds: number
-): Promise<Task> => {
+const updateTask = async (task: Partial<Task>): Promise<Task> => {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -107,21 +113,27 @@ const updateTask = async (
     },
     body: JSON.stringify({
       query: `
-        mutation update_single_task($id: uuid!, $milliseconds: bigint) {
-          update_tasks_by_pk(pk_columns: {id: $id}, _set: {milliseconds: $milliseconds}) {
+        mutation update_single_task($id: uuid!, $milliseconds: bigint, $is_visible: Boolean) {
+          update_tasks_by_pk(pk_columns: {id: $id}, _set: {milliseconds: $milliseconds, is_visible: $is_visible}) {
             id
+            category_id
             category {
               name
             }
             user_id
             description
             milliseconds
+            date
+            is_visible
           }
         }
       `,
       variables: {
         id: task.id,
-        milliseconds: newMilliseconds,
+        description: task.description,
+        milliseconds: task.milliseconds,
+        date: task.date,
+        is_visible: task.is_visible,
       },
     }),
   });
