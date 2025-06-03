@@ -11,6 +11,7 @@ import { ChartAreaInteractive } from "@/components/ChartArea";
 import { Category, Task } from "@/lib/types";
 
 import {
+  createCategory,
   createTask,
   deleteTask,
   fetchCategories,
@@ -27,12 +28,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 function Tasks() {
   const [taskSelected, setTaskSelected] = useState<Task | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskValue, setTaskValue] = useState<string>("");
+  const [categoryValue, setCategoryValue] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [categorySelected, setCategorySelected] = useState<Partial<Category>>();
+  const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
@@ -179,12 +192,35 @@ function Tasks() {
       .padStart(2, "0")}min`;
   };
 
+  const handleAddCategory = async () => {
+    if (!categoryValue) return;
+
+    const newCategory: Partial<Category> = {
+      name: categoryValue,
+    };
+
+    createCategory(newCategory).then((categoryAdded) => {
+      setCategories((prevCategories) => [
+        ...prevCategories,
+        { id: categoryAdded.id, name: categoryAdded.name },
+      ]);
+    });
+
+    setCategoryValue("");
+  };
+
   useEffect(() => {
     if (!userId) return;
 
     fetchTasks(userId).then(setTasks);
     fetchCategories().then(setCategories);
   }, []);
+
+  useEffect(() => {
+    if (!categorySelected) return;
+
+    setOpenCategoryDialog(true);
+  }, [categorySelected]);
 
   useEffect(() => {
     if (!taskInProcess) return;
@@ -221,6 +257,36 @@ function Tasks() {
 
   return (
     <div className="md:grid grid-cols-2 gap-4 min-h-[60dvh]">
+      <AlertDialog
+        open={openCategoryDialog}
+        onOpenChange={setOpenCategoryDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create a category</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter a name for the new category that will help you organize your
+              tasks.
+            </AlertDialogDescription>
+            <div className="flex items-center justify-center gap-2">
+              <Input
+                placeholder="Enter your user code"
+                onChange={(e) => setCategoryValue(e.target.value)}
+              />
+            </div>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex items-center gap-4">
+            <AlertDialogAction
+              onClick={handleAddCategory}
+              disabled={!categoryValue}
+            >
+              Create category
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
         <ChartAreaInteractive
           chartData={groupedTasksByCategory()}
@@ -313,6 +379,8 @@ function Tasks() {
                     {category.name}
                   </SelectItem>
                 ))}
+
+                <SelectItem value="new">New category</SelectItem>
               </SelectContent>
             </Select>
           </div>
