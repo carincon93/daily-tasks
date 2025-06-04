@@ -36,7 +36,7 @@ const ThemeToggle = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="z-20 fixed bottom-14.5 left-4">
+      <DropdownMenuTrigger asChild className="z-20 fixed bottom-2 left-4">
         <button className="bg-gray-950 text-white dark:bg-white p-2 rounded-md shadow-md flex items-center justify-center dark:text-black">
           {theme === "light" ? <Sun /> : <Moon />}
         </button>
