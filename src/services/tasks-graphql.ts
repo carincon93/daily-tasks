@@ -221,6 +221,35 @@ const createCategory = async (
   return result.data.insert_categories_one;
 };
 
+const deleteCategory = async (
+  category: Partial<Category>
+): Promise<Category> => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+    },
+    body: JSON.stringify({
+      query: `
+        mutation delete_single_category($id: uuid!) {
+          delete_categories_by_pk(id: $id) {
+            id
+            name
+          }
+        }
+      `,
+      variables: {
+        id: category.id,
+      },
+    }),
+  });
+
+  const result = await response.json();
+
+  return result.data.delete_categories_by_pk;
+};
+
 const createUser = async (): Promise<User> => {
   const response = await fetch(API_URL, {
     method: "POST",
@@ -339,6 +368,7 @@ const updateSession = async (session: Partial<Session>): Promise<Session> => {
 export {
   fetchCategories,
   createCategory,
+  deleteCategory,
   fetchTasks,
   createTask,
   findTask,

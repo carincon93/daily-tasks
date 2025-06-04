@@ -4,7 +4,7 @@ import {
   getCurrentDate,
   stopTimer,
 } from "@/store/index.store";
-import { Eraser, RefreshCcw } from "lucide-react";
+import { Eraser, RefreshCcw, Trash2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { ChartAreaInteractive } from "@/components/ChartArea";
@@ -13,6 +13,7 @@ import { Category, Task } from "@/lib/types";
 import {
   createCategory,
   createTask,
+  deleteCategory,
   deleteTask,
   fetchCategories,
   fetchTasks,
@@ -172,6 +173,16 @@ function Tasks() {
     deleteTask(task).then(() => fetchTasks(userId).then(setTasks));
   };
 
+  const handleDeleteCategory = async (category: Category) => {
+    if (!category || !userId) return;
+
+    deleteCategory(category).then(() =>
+      setCategories((prevCategories) =>
+        prevCategories.filter((c) => c.id !== category.id)
+      )
+    );
+  };
+
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTaskValue(e.target.value);
   };
@@ -272,6 +283,20 @@ function Tasks() {
               Enter a name for the new category that will help you organize your
               tasks.
             </AlertDialogDescription>
+            <ul className="text-xs">
+              {categories.map((category) => (
+                <li
+                  key={category.id}
+                  className="flex items-center justify-between gap-2 space-y-2"
+                >
+                  <span>{category.name}</span>
+
+                  <button onClick={() => handleDeleteCategory(category)}>
+                    <Trash2 size={14} />
+                  </button>
+                </li>
+              ))}
+            </ul>
             <div className="flex items-center justify-center gap-2">
               <Input
                 placeholder="Enter a category name"
@@ -295,7 +320,7 @@ function Tasks() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="from-pink-400/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
+      <div className="from-white/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
         <ChartAreaInteractive
           chartData={groupedTasksByCategory()}
           categories={categories}
@@ -312,9 +337,9 @@ function Tasks() {
               .filter((task) => task.is_visible)
               .sort((a, b) => b.milliseconds - a.milliseconds)
               .map((task) => (
-                <li key={task.id} className="relative">
+                <li key={task.id} className="relative text-black">
                   <button
-                    className={`flex w-full p-3.5 rounded-sm shadow-md text-xs
+                    className={`flex w-full p-3.5  rounded-sm shadow-md text-xs
                       ${currentDate !== task.date ? "opacity-50" : ""}
                       ${
                         taskSelected?.id === task.id
@@ -361,7 +386,7 @@ function Tasks() {
         <form onSubmit={handleSubmit} className="space-y-2 mt-4 md:mt-0">
           <div className="text-xs grid grid-cols-2 gap-2">
             <Input
-              className=" bg-white text-black w-full"
+              className="!bg-white !text-black w-full"
               type="text"
               name="title"
               placeholder="Task title"
@@ -377,7 +402,7 @@ function Tasks() {
               value={categorySelected?.id}
             >
               <SelectTrigger
-                className="bg-white w-full"
+                className="!bg-white !text-black w-full"
                 aria-label="Select a category"
               >
                 <SelectValue placeholder="Category" />
@@ -395,7 +420,7 @@ function Tasks() {
           </div>
 
           <Button
-            className="w-full"
+            className="w-full bg-black text-white"
             type="submit"
             disabled={!taskValue || !categorySelected}
           >
