@@ -330,7 +330,7 @@ function Tasks() {
 
       <div className="flex flex-col justify-between mt-4 md:mt-0">
         <ul
-          className="space-y-2 h-[100px] overflow-y-auto md:h-full"
+          className="space-y-2 h-[100px] overflow-y-auto md:h-[300px]"
           style={{ scrollbarWidth: "none" }}
         >
           {tasks &&

@@ -36,3 +36,9 @@ body[data-scroll-locked] {
   padding-right: 0px !important;
   margin-right: 0px !important;
 }
+
+.recharts-legend-wrapper > .flex {
+  transform: translateY(8px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
