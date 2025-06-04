@@ -274,7 +274,7 @@ const createUser = async (): Promise<User> => {
   return result.data.insert_users_one;
 };
 
-const fetchSession = async (): Promise<Session> => {
+const fetchSession = async (user_id: string): Promise<Session> => {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -283,16 +283,19 @@ const fetchSession = async (): Promise<Session> => {
     },
     body: JSON.stringify({
       query: `
-          query get_session {
-            session(limit: 1) {
+          query get_session($user_id: uuid!) {
+            session(limit: 1, where: {user_id: {_eq: $user_id}}) {
               id
               start_time
               task_in_process
               end_of_day
+              user_id
             }
           }
         `,
-      variables: {},
+      variables: {
+        user_id
+      },
     }),
   });
 
@@ -315,6 +318,7 @@ const createSession = async (session: Partial<Session>): Promise<Session> => {
             id
             start_time
             task_in_process
+            user_id
           }
         }
       `,
@@ -323,6 +327,7 @@ const createSession = async (session: Partial<Session>): Promise<Session> => {
           start_time: session.start_time,
           end_of_day: session.end_of_day,
           task_in_process: session.task_in_process || null,
+          user_id: session.user_id || null,
         },
       },
     }),

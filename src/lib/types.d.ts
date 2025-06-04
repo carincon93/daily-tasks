@@ -20,9 +20,10 @@ type Category = {
 
 type Session = {
   id: string;
-  start_time: number;
-  end_of_day: number;
+  start_time: number | null;
+  end_of_day: number | null;
   task_in_process: Task | null;
+  user_id: string;
 }
 
 export type { User, Task, Category, Session };

@@ -293,6 +293,7 @@ function Tasks() {
 
                   <button onClick={() => handleDeleteCategory(category)}>
                     <Trash2 size={14} />
+                    {""}
                   </button>
                 </li>
               ))}

@@ -13,8 +13,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { createUser } from "./services/tasks-graphql";
-import { User } from "./lib/types";
+import { createSession, createUser } from "./services/tasks-graphql";
+import { Session, User } from "./lib/types";
 import Loading from "./components/Loader";
 import { useUserStore } from "./store/index.store";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
@@ -34,6 +34,15 @@ const DialogUser = () => {
       .then((user: User) => {
         setUserId(user.id);
         navigate(`/${user.id}`);
+
+        const newSession: Partial<Session> = {
+          start_time: null,
+          end_of_day: null,
+          task_in_process: null,
+          user_id: user.id,
+        };
+
+        createSession(newSession);
       })
       .finally(() => {
         setLoading(false);

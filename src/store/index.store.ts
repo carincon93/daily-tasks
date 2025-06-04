@@ -26,11 +26,25 @@ type GetCurrentDateStore = {
   setCurrentDate: (currentDate: string) => void;
 };
 
-const getSession = async () => {
-  return await fetchSession();
+const getLastPathPart = () => {
+  const pathParts = window.location.pathname.split("/");
+  const lastPart = pathParts[pathParts.length - 1];
+  return lastPart !== "" && lastPart !== "daily-tasks-app" ? lastPart : "";
 };
 
-const endOfDayUtc5 = (timestamp: number) => {
+let userId = getLastPathPart();
+
+const getSession = async () => {
+  let userId = getLastPathPart();
+
+  if (userId === "") return;
+
+  return await fetchSession(userId);
+};
+
+const endOfDayUtc5 = (timestamp: number | null) => {
+  if (!timestamp) return null;
+
   // Convertir a fecha en UTC-5 (Bogotá)
   const date = new Date(timestamp);
 
@@ -81,43 +95,52 @@ export const useTimerStore = create<TimerStore>((set) => {
     startTimer: async (task: Task) => {
       const session = await getSession();
 
+      console.log(session);
+
+      if (!session) return;
+
       const now = Date.now();
 
-      const endOfDay = endOfDayUtc5(now).getTime().toString();
+      const endOfDay = endOfDayUtc5(now)?.getTime().toString();
 
       if (!session) {
         const newSession: Partial<Session> = {
           start_time: now,
           end_of_day: Number(endOfDay),
           task_in_process: task,
+          user_id: userId,
         };
 
         createSession(newSession);
       }
 
+      const startTimeCalc = now - task.milliseconds;
+
       const sessionToUpdate: Partial<Session> = {
         id: session.id,
-        start_time: now,
+        start_time: startTimeCalc,
         end_of_day: Number(endOfDay),
         task_in_process: task,
+        user_id: userId,
       };
 
       updateSession(sessionToUpdate);
-
-      const startTimeCalc = now - task.milliseconds;
 
       set({ startTime: startTimeCalc, running: true });
     },
     stopTimer: async () => {
       const session = await getSession();
 
-      const endOfDay = endOfDayUtc5(session.start_time).getTime().toString();
+      if (!session) return;
+
+      const endOfDay = endOfDayUtc5(session.start_time)?.getTime().toString();
 
       const sessionToUpdate: Partial<Session> = {
         id: session.id,
         start_time: session.start_time,
         end_of_day: Number(endOfDay),
         task_in_process: null,
+        user_id: userId,
       };
 
       updateSession(sessionToUpdate);
@@ -134,11 +157,8 @@ export const getCurrentDate = create<GetCurrentDateStore>((set) => ({
   setCurrentDate: (currentDate: string) => set({ currentDate }),
 }));
 
-const pathParts = window.location.pathname.split("/");
-const lastPart = pathParts[pathParts.length - 1];
-
 export const useUserStore = create<UserStore>((set) => ({
-  userId: lastPart !== "" && lastPart !== "daily-tasks-app" ? lastPart : null,
+  userId: userId,
   setUserId: (userId: string | null) => set({ userId }),
 }));
 
