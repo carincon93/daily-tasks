@@ -31,6 +31,7 @@ import {
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -44,7 +45,9 @@ function Tasks() {
   const [taskValue, setTaskValue] = useState<string>("");
   const [categoryValue, setCategoryValue] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categorySelected, setCategorySelected] = useState<Partial<Category>>();
+  const [categorySelected, setCategorySelected] = useState<Partial<Category>>({
+    id: "",
+  });
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
@@ -177,7 +180,7 @@ function Tasks() {
     e.preventDefault();
     handleAddTask();
     setTaskValue("");
-    setCategorySelected({ id: undefined });
+    setCategorySelected({ id: "" });
   };
 
   const calculateTaskTime = (task: Task) => {
@@ -207,6 +210,7 @@ function Tasks() {
     });
 
     setCategoryValue("");
+    setCategorySelected({ id: "" });
   };
 
   useEffect(() => {
@@ -217,9 +221,9 @@ function Tasks() {
   }, []);
 
   useEffect(() => {
-    if (!categorySelected || categorySelected && categorySelected.name !== "new") return;
-
-    setOpenCategoryDialog(true);
+    if (categorySelected && categorySelected.id === "new") {
+      setOpenCategoryDialog(true);
+    }
   }, [categorySelected]);
 
   useEffect(() => {
@@ -270,13 +274,17 @@ function Tasks() {
             </AlertDialogDescription>
             <div className="flex items-center justify-center gap-2">
               <Input
-                placeholder="Enter the category name"
+                placeholder="Enter a category name"
                 onChange={(e) => setCategoryValue(e.target.value)}
               />
             </div>
           </AlertDialogHeader>
 
           <AlertDialogFooter className="flex items-center gap-4">
+            <AlertDialogCancel onClick={() => setCategorySelected({ id: "" })}>
+              Cancel
+            </AlertDialogCancel>
+
             <AlertDialogAction
               onClick={handleAddCategory}
               disabled={!categoryValue}
@@ -366,6 +374,7 @@ function Tasks() {
               onValueChange={(value) => {
                 setCategorySelected({ id: value });
               }}
+              value={categorySelected?.id}
             >
               <SelectTrigger
                 className="bg-white w-full"
