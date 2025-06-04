@@ -338,20 +338,22 @@ function Tasks() {
               .filter((task) => task.is_visible)
               .sort((a, b) => b.milliseconds - a.milliseconds)
               .map((task) => (
-                <li key={task.id} className="relative text-black">
+                <li key={task.id} className="relative text-black mb-4">
                   <button
                     className={`flex w-full p-3.5  rounded-sm shadow-md text-xs
                       ${currentDate !== task.date ? "opacity-50" : ""}
                       ${
                         taskSelected?.id === task.id
-                          ? "bg-yellow-500 shadow-lg shadow-yellow-500/50 inset-shadow-white !text-yellow-900"
+                          ? "bg-yellow-500 shadow-lg shadow-yellow-500/50 inset-shadow-white "
                           : "bg-white"
                       }
                       `}
                     onClick={() => handleTaskSelected(task)}
                     disabled={taskSelected?.id === task.id}
                   >
-                    <p className="text-left pr-7">{task.description}</p>
+                    <p className="text-left pr-7 text-yellow-900">
+                      {task.description}
+                    </p>
                   </button>
 
                   <div className="absolute right-2 top-0.5">
@@ -371,13 +373,19 @@ function Tasks() {
                       <button
                         onClick={() => handleDeleteTask(task)}
                         type="button"
-                        className="translate-y-1"
+                        className="bg-yellow-700/70 text-white p-0.5 rounded shadow-md translate-y-1 hover:opacity-90"
                       >
-                        <Eraser size={18} />
+                        <Eraser size={14} />
                         {""}
                       </button>
                     </div>
-                    <span className="text-xs">
+                    <span
+                      className={`text-xs ${
+                        taskSelected?.id === task.id
+                          ? "bg-yellow-700 text-white "
+                          : "bg-slate-200 opacity-60"
+                      } py-0.5 px-2.5 rounded shadow-md translate-y-2.5 block`}
+                    >
                       {calculateTaskTime(task) || "00hr 00min"}
                     </span>
                   </div>

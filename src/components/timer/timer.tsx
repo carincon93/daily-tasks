@@ -1,5 +1,4 @@
 import { useTimerStore } from "@/store/index.store";
-import { Timer as TimerIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Loading from "@/components/Loader";
 
