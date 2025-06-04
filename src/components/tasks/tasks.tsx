@@ -344,7 +344,7 @@ function Tasks() {
                       ${currentDate !== task.date ? "opacity-50" : ""}
                       ${
                         taskSelected?.id === task.id
-                          ? "bg-green-200"
+                          ? "bg-yellow-500 shadow-lg shadow-yellow-500/50 inset-shadow-white !text-yellow-900"
                           : "bg-white"
                       }
                       `}
@@ -371,6 +371,7 @@ function Tasks() {
                       <button
                         onClick={() => handleDeleteTask(task)}
                         type="button"
+                        className="translate-y-1"
                       >
                         <Eraser size={18} />
                         {""}

@@ -41,7 +41,12 @@ export function Timer() {
 
   return (
     <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 max-lg:p-8 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[30dvh] h-full relative">
-      <TimerIcon className="size-12" />
+      {/* <TimerIcon className="size-12" /> */}
+      <img
+        src="./stopwatch.png"
+        alt="timer"
+        className="size-18 object-contain"
+      />
 
       <div className="flex space-x-4 text-4xl">
         <div>
