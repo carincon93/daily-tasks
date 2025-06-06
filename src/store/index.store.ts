@@ -1,9 +1,5 @@
 import { Session, Task } from "@/lib/types";
-import {
-  createSession,
-  fetchSession,
-  updateSession,
-} from "@/services/tasks-graphql";
+import { fetchSession, updateSession } from "@/services/tasks-graphql";
 import { create } from "zustand";
 
 type TimerStore = {
@@ -12,7 +8,7 @@ type TimerStore = {
   endOfDay: number | null;
   taskInProcess: Task | null;
   running: boolean;
-  startTimer: (task: Task) => void;
+  startTimer: (task: Task, isTaskSelected: boolean) => void;
   stopTimer: () => void;
 };
 
@@ -92,10 +88,8 @@ export const useTimerStore = create<TimerStore>((set) => {
     endOfDay: null,
     taskInProcess: null,
     running: false,
-    startTimer: async (task: Task) => {
+    startTimer: async (task: Task, isTaskSelected: boolean) => {
       const session = await getSession();
-
-      console.log(session);
 
       if (!session) return;
 
@@ -103,30 +97,21 @@ export const useTimerStore = create<TimerStore>((set) => {
 
       const endOfDay = endOfDayUtc5(now)?.getTime().toString();
 
-      if (!session) {
-        const newSession: Partial<Session> = {
-          start_time: now,
+      if (isTaskSelected) {
+        const sessionToUpdate: Partial<Session> = {
+          id: session.id,
+          start_time: now - task.milliseconds,
           end_of_day: Number(endOfDay),
           task_in_process: task,
           user_id: userId,
         };
 
-        createSession(newSession);
+        updateSession(sessionToUpdate);
+
+        set({ startTime: now - task.milliseconds, running: true });
+      } else {
+        set({ startTime: session.start_time, running: true });
       }
-
-      const startTimeCalc = now - task.milliseconds;
-
-      const sessionToUpdate: Partial<Session> = {
-        id: session.id,
-        start_time: startTimeCalc,
-        end_of_day: Number(endOfDay),
-        task_in_process: task,
-        user_id: userId,
-      };
-
-      updateSession(sessionToUpdate);
-
-      set({ startTime: startTimeCalc, running: true });
     },
     stopTimer: async () => {
       const session = await getSession();
@@ -168,6 +153,6 @@ export const endOfDay = () => useTimerStore((state) => state.endOfDay);
 export const taskInProcess = () =>
   useTimerStore((state) => state.taskInProcess);
 export const running = () => useTimerStore((state) => state.running);
-export const startTimer = (task: Task) =>
-  useTimerStore.getState().startTimer(task);
+export const startTimer = (task: Task, isTaskSelected: boolean) =>
+  useTimerStore.getState().startTimer(task, isTaskSelected);
 export const stopTimer = () => useTimerStore.getState().stopTimer();

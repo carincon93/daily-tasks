@@ -16,6 +16,7 @@ import {
   deleteCategory,
   deleteTask,
   fetchCategories,
+  fetchSession,
   fetchTasks,
   updateTask,
 } from "@/services/tasks-graphql";
@@ -92,7 +93,7 @@ function Tasks() {
       handleUpdateTask();
     }
 
-    startTimer(task);
+    startTimer(task, true);
     setTaskSelected(task);
   };
 
@@ -225,13 +226,6 @@ function Tasks() {
   };
 
   useEffect(() => {
-    if (!userId) return;
-
-    fetchTasks(userId).then(setTasks);
-    fetchCategories().then(setCategories);
-  }, []);
-
-  useEffect(() => {
     if (categorySelected && categorySelected.id === "new") {
       setOpenCategoryDialog(true);
     }
@@ -269,6 +263,20 @@ function Tasks() {
       }
     }
   }, [taskInProcess]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    fetchSession(userId).then((session) => {
+      if (session && session.task_in_process) {
+        setTaskSelected(session.task_in_process);
+        startTimer(session.task_in_process, false);
+      }
+    });
+
+    fetchTasks(userId).then(setTasks);
+    fetchCategories().then(setCategories);
+  }, []);
 
   return (
     <div className="md:grid grid-cols-2 gap-4 min-h-[60dvh]">
@@ -361,6 +369,7 @@ function Tasks() {
                       {currentDate !== task.date && (
                         <button
                           type="button"
+                          className="translate-y-1 hover:opacity-90"
                           onClick={() => {
                             handleCloneTask(task);
                           }}
