@@ -7,7 +7,7 @@ import {
 import { Eraser, RefreshCcw, Trash2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { ChartAreaInteractive } from "@/components/ChartArea";
+import { ChartLineMultiple } from "@/components/ChartLine";
 import { Category, Task } from "@/lib/types";
 
 import {
@@ -46,6 +46,7 @@ function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskValue, setTaskValue] = useState<string>("");
   const [categoryValue, setCategoryValue] = useState<string>("");
+  const [categoryColor, setCategoryColor] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [categorySelected, setCategorySelected] = useState<Partial<Category>>({
     id: "",
@@ -212,12 +213,17 @@ function Tasks() {
 
     const newCategory: Partial<Category> = {
       name: categoryValue,
+      color: categoryColor,
     };
 
     createCategory(newCategory).then((categoryAdded) => {
       setCategories((prevCategories) => [
         ...prevCategories,
-        { id: categoryAdded.id, name: categoryAdded.name },
+        {
+          id: categoryAdded.id,
+          name: categoryAdded.name,
+          color: categoryAdded.color,
+        },
       ]);
     });
 
@@ -311,6 +317,11 @@ function Tasks() {
                 placeholder="Enter a category name"
                 onChange={(e) => setCategoryValue(e.target.value)}
               />
+
+              <Input
+                type="color"
+                onChange={(e) => setCategoryColor(e.target.value)}
+              />
             </div>
           </AlertDialogHeader>
 
@@ -330,7 +341,7 @@ function Tasks() {
       </AlertDialog>
 
       <div className="from-white/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
-        <ChartAreaInteractive
+        <ChartLineMultiple
           chartData={groupedTasksByCategory()}
           categories={categories}
         />
@@ -348,14 +359,17 @@ function Tasks() {
               .map((task) => (
                 <li key={task.id} className="relative text-black mb-4">
                   <button
-                    className={`flex w-full p-3.5  rounded-sm shadow-md text-xs
+                    className={`flex w-full p-3.5 border-l-3 rounded-sm shadow-md text-xs
                       ${currentDate !== task.date ? "opacity-50" : ""}
                       ${
                         taskSelected?.id === task.id
-                          ? "bg-yellow-500 shadow-lg shadow-yellow-500/50 inset-shadow-white "
+                          ? "bg-yellow-400 shadow-lg shadow-yellow-500/50 inset-shadow-white "
                           : "bg-white"
                       }
                       `}
+                    style={{
+                      borderColor: task.category.color || "#fbbf24",
+                    }}
                     onClick={() => handleTaskSelected(task)}
                     disabled={taskSelected?.id === task.id}
                   >

@@ -18,6 +18,7 @@ const fetchTasks = async (user_id: string): Promise<Task[]> => {
               category_id
               category {
                 name
+                color
               }
               user_id
               description
@@ -119,6 +120,7 @@ const updateTask = async (task: Partial<Task>): Promise<Task> => {
             category_id
             category {
               name
+              color
             }
             user_id
             description
@@ -182,6 +184,7 @@ const fetchCategories = async (): Promise<Category[]> => {
             categories {
               id
               name
+              color
             }
           }
         `,
@@ -203,15 +206,17 @@ const createCategory = async (
     },
     body: JSON.stringify({
       query: `
-        mutation insert_single_category($name: String!) {
-          insert_categories_one(object: {name: $name}) {
+        mutation insert_single_category($name: String!, $color: String!) {
+          insert_categories_one(object: {name: $name, color: $color}) {
             id
             name
+            color
           }
         }
       `,
       variables: {
         name: category.name,
+        color: category.color,
       },
     }),
   });
@@ -236,6 +241,7 @@ const deleteCategory = async (
           delete_categories_by_pk(id: $id) {
             id
             name
+            color
           }
         }
       `,

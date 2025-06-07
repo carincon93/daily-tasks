@@ -1,4 +1,4 @@
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import {
   ChartConfig,
@@ -15,15 +15,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
-import { getCurrentDate } from "@/store/index.store";
 import { Category } from "@/lib/types";
+import { getCurrentDate } from "@/store/index.store";
+import { useState } from "react";
 
-export const description = "An interactive area chart";
+export const description = "A multiple line chart";
+
+const chartData = [
+  { date: "2025-06-01", desktop: 186, mobile: 80 },
+  { date: "2025-06-02", desktop: 305, mobile: 200 },
+  { date: "2025-06-03", desktop: 237, mobile: 120 },
+  { date: "2025-06-04", desktop: 73, mobile: 190 },
+  { date: "2025-06-05", desktop: 209, mobile: 130 },
+  { date: "2025-06-06", desktop: 214, mobile: 140 },
+];
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "var(--chart-1)",
+  },
+  mobile: {
+    label: "Mobile",
+    color: "var(--chart-2)",
+  },
+} satisfies ChartConfig;
 
 interface ChartDataItem {
   date: string;
-  [key: string]: string | number;
+  [key: string]: number | string;
 }
 
 interface ChartAreaInteractiveProps {
@@ -33,14 +53,12 @@ interface ChartAreaInteractiveProps {
 
 type TimeRange = "90d" | "30d" | "7d";
 
-export function ChartAreaInteractive({
+export function ChartLineMultiple({
   chartData,
   categories,
 }: ChartAreaInteractiveProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("7d");
   const { currentDate } = getCurrentDate();
-
-  chartData.sort((a, b) => a.date.localeCompare(b.date));
 
   const chartConfig = categories.reduce((config, category, index) => {
     return {
@@ -69,6 +87,8 @@ export function ChartAreaInteractive({
     return date >= startDate && date <= endDate;
   });
 
+  filteredData.sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <>
       <Select
@@ -94,41 +114,21 @@ export function ChartAreaInteractive({
         </SelectContent>
       </Select>
 
-      <ChartContainer
-        config={chartConfig}
-        className="aspect-auto h-[250px] w-full"
-      >
-        <AreaChart data={filteredData}>
-          <defs>
-            {categories.map((category) => (
-              <linearGradient
-                key={category.id}
-                id={`fill${category.name}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="5%"
-                  stopColor={`var(--color-${category.name})`}
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={`var(--color-${category.name})`}
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            ))}
-          </defs>
+      <ChartContainer config={chartConfig}>
+        <LineChart
+          accessibilityLayer
+          data={filteredData}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
           <CartesianGrid vertical={false} />
           <XAxis
             dataKey="date"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            minTickGap={32}
             interval="preserveStartEnd"
             tickFormatter={(value: string) => {
               const date = new Date(value);
@@ -140,34 +140,21 @@ export function ChartAreaInteractive({
               });
             }}
           />
-          <ChartTooltip
-            cursor={false}
-            content={
-              <ChartTooltipContent
-                labelFormatter={(value: string) => {
-                  const date = new Date(value);
-                  date.setDate(date.getDate() + 1);
+          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
 
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-                indicator="dot"
-              />
-            }
-          />
           {categories.map((category) => (
-            <Area
+            <Line
+              key={category.id}
               dataKey={category.name}
-              type="natural"
-              fill={`url(#fill${category.name})`}
-              stroke={`var(--color-${category.name})`}
-              stackId="a"
+              type="monotone"
+              stroke={category.color}
+              strokeWidth={2}
+              dot={false}
             />
           ))}
+
           <ChartLegend content={<ChartLegendContent />} />
-        </AreaChart>
+        </LineChart>
       </ChartContainer>
     </>
   );
