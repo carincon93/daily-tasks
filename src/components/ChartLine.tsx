@@ -1,4 +1,4 @@
-import { Area, CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import {
   ChartConfig,
@@ -20,26 +20,6 @@ import { getCurrentDate } from "@/store/index.store";
 import { useState } from "react";
 
 export const description = "A multiple line chart";
-
-const chartData = [
-  { date: "2025-06-01", desktop: 186, mobile: 80 },
-  { date: "2025-06-02", desktop: 305, mobile: 200 },
-  { date: "2025-06-03", desktop: 237, mobile: 120 },
-  { date: "2025-06-04", desktop: 73, mobile: 190 },
-  { date: "2025-06-05", desktop: 209, mobile: 130 },
-  { date: "2025-06-06", desktop: 214, mobile: 140 },
-];
-
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig;
 
 interface ChartDataItem {
   date: string;
