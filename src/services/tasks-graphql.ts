@@ -114,8 +114,8 @@ const updateTask = async (task: Partial<Task>): Promise<Task> => {
     },
     body: JSON.stringify({
       query: `
-        mutation update_single_task($id: uuid!, $milliseconds: bigint, $is_visible: Boolean) {
-          update_tasks_by_pk(pk_columns: {id: $id}, _set: {milliseconds: $milliseconds, is_visible: $is_visible}) {
+        mutation update_single_task($id: uuid!, $_set: tasks_set_input!) {
+          update_tasks_by_pk(pk_columns: {id: $id}, _set: $_set) {
             id
             category_id
             category {
@@ -132,10 +132,14 @@ const updateTask = async (task: Partial<Task>): Promise<Task> => {
       `,
       variables: {
         id: task.id,
-        description: task.description,
-        milliseconds: task.milliseconds,
-        date: task.date,
-        is_visible: task.is_visible,
+        _set: {
+          description: task.description,
+          milliseconds: task.milliseconds,
+          date: task.date,
+          is_visible: task.is_visible,
+          user_id: task.user_id,
+          category_id: task.category_id,
+        }
       },
     }),
   });
@@ -300,7 +304,7 @@ const fetchSession = async (user_id: string): Promise<Session> => {
           }
         `,
       variables: {
-        user_id
+        user_id,
       },
     }),
   });

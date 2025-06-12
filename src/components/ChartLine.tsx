@@ -94,7 +94,10 @@ export function ChartLineMultiple({
         </SelectContent>
       </Select>
 
-      <ChartContainer config={chartConfig}>
+      <ChartContainer
+        config={chartConfig}
+        className="xl:h-[370px] 2xl:h-[500px] 2xl:translate-x-1/6"
+      >
         <LineChart
           accessibilityLayer
           data={filteredData}

@@ -33,14 +33,13 @@ export function Timer() {
 
   if (loading)
     return (
-      <div className="h-full flex items-center justify-center min-h-[30dvh]">
+      <div className="flex items-center justify-center h-full">
         <Loading className="text-black dark:text-white" />
       </div>
     );
 
   return (
-    <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 max-lg:p-8 rounded-2xl shadow-md border-x border-t border-gray-400 min-h-[30dvh] h-full relative">
-      {/* <TimerIcon className="size-12" /> */}
+    <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 p-4 rounded-2xl shadow-md border-x border-t border-gray-400 relative">
       <img
         src="./stopwatch.png"
         alt="timer"

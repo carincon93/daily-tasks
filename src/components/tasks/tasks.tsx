@@ -4,7 +4,7 @@ import {
   getCurrentDate,
   stopTimer,
 } from "@/store/index.store";
-import { Eraser, RefreshCcw, Trash2 } from "lucide-react";
+import { Eraser, Pencil, RefreshCcw, Trash2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { ChartLineMultiple } from "@/components/ChartLine";
@@ -52,6 +52,8 @@ function Tasks() {
     id: "",
   });
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
+  const [openUpdateTaskDialog, setOpenUpdateTaskDialog] = useState(false);
+  const [taskSelectedToUpdate, setTaskSelectedToUpdate] = useState<Task>();
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
@@ -90,8 +92,21 @@ function Tasks() {
     if (!task || taskSelected?.id === task.id || currentDate !== task.date)
       return;
 
-    if (taskSelected?.id !== task.id) {
-      handleUpdateTask();
+    if (taskSelected?.id !== task.id && startTime && taskSelected) {
+      const newTaskMs = Date.now() - startTime;
+
+      const taskToUpdate: Task = {
+        id: taskSelected.id,
+        milliseconds: newTaskMs,
+        is_visible: taskSelected.is_visible,
+        description: taskSelected.description,
+        user_id: taskSelected.user_id,
+        category: taskSelected.category,
+        category_id: taskSelected.category_id,
+        date: taskSelected.date,
+      };
+
+      handleUpdateTask(taskToUpdate);
     }
 
     startTimer(task, true);
@@ -144,29 +159,10 @@ function Tasks() {
     createTask(newTask).then(() => fetchTasks(userId).then(setTasks));
   };
 
-  const handleUpdateTask = async () => {
+  const handleUpdateTask = async (taskToUpdate: Task) => {
     if (!taskSelected || !startTime || !userId) return;
 
-    const newTaskMs = Date.now() - startTime;
-
-    const taskToUpdate: Partial<Task> = {
-      id: taskSelected.id,
-      milliseconds: newTaskMs,
-      is_visible: taskSelected.is_visible,
-    };
-
-    updateTask(taskToUpdate).then(() =>
-      setTasks((prevTasks) => {
-        const updatedTasks = prevTasks
-          .sort((a, b) => b.milliseconds - a.milliseconds)
-          .map((prevTask) =>
-            prevTask.id === taskSelected.id
-              ? { ...prevTask, milliseconds: newTaskMs }
-              : prevTask
-          );
-        return updatedTasks;
-      })
-    );
+    updateTask(taskToUpdate).then(() => fetchTasks(userId).then(setTasks));
   };
 
   const handleDeleteTask = async (task: Task) => {
@@ -232,6 +228,12 @@ function Tasks() {
   };
 
   useEffect(() => {
+    if (!taskSelectedToUpdate) return;
+
+    setOpenUpdateTaskDialog(true);
+  }, [taskSelectedToUpdate]);
+
+  useEffect(() => {
     if (categorySelected && categorySelected.id === "new") {
       setOpenCategoryDialog(true);
     }
@@ -285,7 +287,7 @@ function Tasks() {
   }, []);
 
   return (
-    <div className="md:grid grid-cols-2 gap-4 min-h-[60dvh]">
+    <div className="md:grid grid-cols-2 gap-4">
       <AlertDialog
         open={openCategoryDialog}
         onOpenChange={setOpenCategoryDialog}
@@ -340,6 +342,61 @@ function Tasks() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog
+        open={openUpdateTaskDialog}
+        onOpenChange={setOpenUpdateTaskDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Update the task details below to modify this task.
+            </AlertDialogDescription>
+            <div className="flex flex-col gap-2">
+              <Input
+                placeholder="Enter task description"
+                type="text"
+                value={taskSelectedToUpdate?.description}
+                onChange={(e) =>
+                  setTaskSelectedToUpdate((prev) =>
+                    prev ? { ...prev, description: e.target.value } : prev
+                  )
+                }
+              />
+
+              <Input
+                placeholder="Minutes"
+                type="number"
+                min={0}
+                step={0.1}
+                onChange={(e) =>
+                  setTaskSelectedToUpdate((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          milliseconds: Number(e.target.value) * 1000 * 60,
+                        }
+                      : prev
+                  )
+                }
+              />
+            </div>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex items-center gap-4">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={() => {
+                taskSelectedToUpdate && handleUpdateTask(taskSelectedToUpdate);
+              }}
+            >
+              Update task
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="from-white/20 to-transparent bg-gradient-to-b p-4 rounded-2xl shadow-md border-x border-t border-gray-400 z-[6] relative">
         <ChartLineMultiple
           chartData={groupedTasksByCategory()}
@@ -349,7 +406,7 @@ function Tasks() {
 
       <div className="flex flex-col justify-between mt-4 md:mt-0">
         <ul
-          className="space-y-2 h-[100px] overflow-y-auto md:h-[300px]"
+          className="space-y-2 h-[240px] overflow-y-auto md:h-[300px]"
           style={{ scrollbarWidth: "none" }}
         >
           {tasks &&
@@ -379,7 +436,7 @@ function Tasks() {
                   </button>
 
                   <div className="absolute right-2 top-0.5">
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-center items-center gap-2">
                       {currentDate !== task.date && (
                         <button
                           type="button"
@@ -392,6 +449,14 @@ function Tasks() {
                           {""}
                         </button>
                       )}
+
+                      <button
+                        onClick={() => setTaskSelectedToUpdate(task)}
+                        className="mt-2"
+                      >
+                        <Pencil size={16} />
+                        {""}
+                      </button>
 
                       <button
                         onClick={() => handleDeleteTask(task)}

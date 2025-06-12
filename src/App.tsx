@@ -112,7 +112,7 @@ function App() {
                 fetchPriority="high"
               />
 
-              <div className="min-h-[inherit] p-4 space-y-4 relative z-10 dark:text-white">
+              <div className="h-screen p-4 space-y-4 relative z-10 dark:text-white">
                 <div className="boxes-pattern absolute size-full inset-0 -z-1"></div>
 
                 <Timer />
