@@ -406,7 +406,7 @@ function Tasks() {
 
       <div className="flex flex-col justify-between mt-4 md:mt-0">
         <ul
-          className="space-y-2 h-[240px] overflow-y-auto md:h-[300px]"
+          className="space-y-2 h-[240px] overflow-y-auto md:h-[300px] 2xl:h-[480px]"
           style={{ scrollbarWidth: "none" }}
         >
           {tasks &&
