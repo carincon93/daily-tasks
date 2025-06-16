@@ -160,7 +160,7 @@ function Tasks() {
   };
 
   const handleUpdateTask = async (taskToUpdate: Task) => {
-    if (!taskSelected || !startTime || !userId) return;
+    if (!taskToUpdate || !userId) return;
 
     updateTask(taskToUpdate).then(() => fetchTasks(userId).then(setTasks));
   };
