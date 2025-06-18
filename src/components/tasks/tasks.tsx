@@ -53,7 +53,7 @@ function Tasks() {
   });
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
   const [openUpdateTaskDialog, setOpenUpdateTaskDialog] = useState(false);
-  const [taskSelectedToUpdate, setTaskSelectedToUpdate] = useState<Task>();
+  const [taskSelectedToUpdate, setTaskSelectedToUpdate] = useState<Task | null>();
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
@@ -388,7 +388,7 @@ function Tasks() {
           </AlertDialogHeader>
 
           <AlertDialogFooter className="flex items-center gap-4">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setTaskSelectedToUpdate(null)}>Cancel</AlertDialogCancel>
 
             <AlertDialogAction
               onClick={() => {
