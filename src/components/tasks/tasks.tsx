@@ -368,7 +368,11 @@ function Tasks() {
                 placeholder="Minutes"
                 type="number"
                 min={0}
-                step={0.1}
+                value={
+                  taskSelectedToUpdate
+                    ? (taskSelectedToUpdate.milliseconds / 1000 / 60).toFixed(0)
+                    : 0
+                }
                 onChange={(e) =>
                   setTaskSelectedToUpdate((prev) =>
                     prev
