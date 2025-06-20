@@ -567,7 +567,7 @@ function Tasks() {
           <Button
             className="w-full bg-black text-white"
             type="submit"
-            disabled={!taskValue || !categorySelected}
+            disabled={!taskValue || !categorySelected.id}
           >
             Add task
           </Button>
