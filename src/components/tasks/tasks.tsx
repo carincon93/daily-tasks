@@ -53,7 +53,8 @@ function Tasks() {
   });
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
   const [openUpdateTaskDialog, setOpenUpdateTaskDialog] = useState(false);
-  const [taskSelectedToUpdate, setTaskSelectedToUpdate] = useState<Task | null>();
+  const [taskSelectedToUpdate, setTaskSelectedToUpdate] =
+    useState<Task | null>();
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
@@ -63,6 +64,7 @@ function Tasks() {
     const grouped = tasks.reduce<Record<string, Record<string, number>>>(
       (acc, task) => {
         const { date, category, milliseconds } = task;
+
         if (!acc[date]) {
           acc[date] = {};
         }
@@ -72,6 +74,7 @@ function Tasks() {
             milliseconds / (1000 * 60 * 60)
           ).toFixed(2)
         );
+
         return acc;
       },
       {}
@@ -286,6 +289,43 @@ function Tasks() {
     fetchCategories().then(setCategories);
   }, []);
 
+  const getCategoriesWithHours = (): Category[] => {
+    if (!tasks || tasks.length === 0) return [];
+
+    const categoriesWithHours = tasks.reduce<Record<string, number>>(
+      (acc, task) => {
+        const { category, milliseconds } = task;
+
+        if (!acc[category.name]) {
+          acc[category.name] = 0;
+        }
+
+        acc[category.name] = (Number(acc[category.name]) || 0) + milliseconds;
+
+        return acc;
+      },
+      {}
+    );
+
+    return Object.entries(categoriesWithHours).map(([category, totalHours]) => {
+      const row = {
+        id: categories.find((c) => c.name === category)?.id || "",
+        name:
+          category +
+          ` (${Math.floor(totalHours / (1000 * 60 * 60))
+            .toString()
+            .padStart(2, "0")}:${Math.floor(
+            (totalHours % (1000 * 60 * 60)) / (1000 * 60)
+          )
+            .toString()
+            .padStart(2, "0")})`,
+        color: categories.find((c) => c.name === category)?.color || "",
+      };
+
+      return row;
+    });
+  };
+
   return (
     <div className="md:grid grid-cols-2 gap-4">
       <AlertDialog
@@ -388,7 +428,9 @@ function Tasks() {
           </AlertDialogHeader>
 
           <AlertDialogFooter className="flex items-center gap-4">
-            <AlertDialogCancel onClick={() => setTaskSelectedToUpdate(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setTaskSelectedToUpdate(null)}>
+              Cancel
+            </AlertDialogCancel>
 
             <AlertDialogAction
               onClick={() => {
@@ -405,6 +447,7 @@ function Tasks() {
         <ChartLineMultiple
           chartData={groupedTasksByCategory()}
           categories={categories}
+          chartLegend={getCategoriesWithHours()}
         />
       </div>
 

@@ -4,7 +4,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -29,6 +28,7 @@ interface ChartDataItem {
 interface ChartAreaInteractiveProps {
   chartData: ChartDataItem[];
   categories: Category[];
+  chartLegend: Category[];
 }
 
 type TimeRange = "90d" | "30d" | "7d";
@@ -36,6 +36,7 @@ type TimeRange = "90d" | "30d" | "7d";
 export function ChartLineMultiple({
   chartData,
   categories,
+  chartLegend,
 }: ChartAreaInteractiveProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("7d");
   const { currentDate } = getCurrentDate();
@@ -136,7 +137,28 @@ export function ChartLineMultiple({
             />
           ))}
 
-          <ChartLegend content={<ChartLegendContent />} />
+          <ChartLegend
+            content={
+              <div className="grid grid-cols-4 gap-4 mt-4">
+                {chartLegend.map((legend) => (
+                  <div className="flex items-center" key={legend.id}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: legend.color,
+                        marginRight: 8,
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    <small>{legend.name}</small>
+                  </div>
+                ))}
+              </div>
+            }
+          />
         </LineChart>
       </ChartContainer>
     </>
