@@ -145,9 +145,9 @@ export function ChartLineMultiple({
                     <span
                       style={{
                         display: "inline-block",
-                        width: 10,
-                        height: 10,
-                        borderRadius: "50%",
+                        width: 8,
+                        height: 8,
+                        borderRadius: "20%",
                         backgroundColor: legend.color,
                         marginRight: 8,
                         verticalAlign: "middle",
