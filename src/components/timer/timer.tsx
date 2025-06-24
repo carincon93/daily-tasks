@@ -60,7 +60,7 @@ export function Timer() {
           {seconds.padStart(2, "0")}
         </div>
 
-        <div className="text-center">📆 {formattedDate}</div>
+        <div className="flex items-center justify-center"><img src="/daily-tasks-app/emojis/calendar.png" className="mr-2" width={18} alt="Calendar Icon" /> {formattedDate}</div>
       </div>
     </div>
   );
