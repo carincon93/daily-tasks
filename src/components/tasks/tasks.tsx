@@ -494,7 +494,7 @@ function Tasks() {
           <form onSubmit={handleSubmit} className="space-y-2">
             <div className="text-xs grid grid-cols-3 gap-2">
               <Input
-                className="!bg-white !text-black w-full"
+                className="!bg-white !text-black w-full text-xs"
                 type="text"
                 name="title"
                 placeholder="Task title"
@@ -516,7 +516,7 @@ function Tasks() {
                 value={taskToCreate?.emoji}
               >
                 <SelectTrigger
-                  className="!bg-white !text-black w-full"
+                  className="!bg-white !text-black w-full text-xs"
                   aria-label="Select an emoji"
                 >
                   <SelectValue placeholder="Emoji" />
@@ -543,7 +543,7 @@ function Tasks() {
                 value={taskToCreate?.category_id}
               >
                 <SelectTrigger
-                  className="!bg-white !text-black w-full"
+                  className="!bg-white !text-black w-full text-xs"
                   aria-label="Select a category"
                 >
                   <SelectValue placeholder="Category" />
@@ -561,7 +561,7 @@ function Tasks() {
             </div>
 
             <Button
-              className="rounded-full fixed right-4 bottom-7 size-14"
+              className="rounded-full fixed right-4 bottom-5 size-14"
               type="submit"
               disabled={
                 !taskToCreate?.description ||
