@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -36,17 +35,39 @@ const ThemeToggle = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="z-20 fixed bottom-2 left-4">
+      <DropdownMenuTrigger asChild className="z-20 fixed bottom-7 left-4">
         <button className="bg-gray-950 text-white dark:bg-white p-2 rounded-md shadow-md flex items-center justify-center dark:text-black">
-          {theme === "light" ? <Sun /> : <Moon />}
+          {theme === "light" ? (
+            <img
+              src="/daily-tasks-app/emojis/sun.png"
+              alt="Light Theme"
+              width={30}
+            />
+          ) : (
+            <img
+              src="/daily-tasks-app/emojis/moon.png"
+              alt="Dark Theme"
+              width={30}
+            />
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => toggleTheme("light")}>
-          <Sun /> Light
+          <img
+            src="/daily-tasks-app/emojis/sun.png"
+            alt="Light Theme"
+            width={30}
+          />{" "}
+          Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => toggleTheme("dark")}>
-          <Moon /> Dark
+          <img
+            src="/daily-tasks-app/emojis/moon.png"
+            alt="Dark Theme"
+            width={30}
+          />{" "}
+          Dark
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

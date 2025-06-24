@@ -39,14 +39,14 @@ export function Timer() {
     );
 
   return (
-    <div className="dark:from-gray-800 to-transparent bg-gradient-to-b flex flex-col items-center justify-center space-y-4 p-4 rounded-2xl shadow-md border-x border-t border-gray-400 relative">
+    <div className="flex items-center justify-center space-y-4 p-4 rounded-lg shadow-md bg-slate-300/70 backdrop-blur-2xl border-amber-400 border text-slate-800 fixed xl:bottom-0 max-xl:top-4 left-0 right-0 mx-auto z-50 w-50">
       <img
-        src="./stopwatch.png"
+        src="/daily-tasks-app/emojis/watch.png"
         alt="timer"
-        className="size-18 object-contain"
+        className="size-12 mb-0 mr-2 object-contain"
       />
 
-      <div className="flex space-x-4 text-4xl">
+      <div className="flex space-x-4 text-3xl">
         <div>
           {hours.toString().padStart(2, "0")}:
           {minutes < 0 ? "00" : minutes.toString().padStart(2, "0")}:

@@ -95,10 +95,7 @@ export function ChartLineMultiple({
         </SelectContent>
       </Select>
 
-      <ChartContainer
-        config={chartConfig}
-        className="xl:h-[370px] 2xl:h-[500px] 2xl:translate-x-1/6"
-      >
+      <ChartContainer config={chartConfig}>
         <LineChart
           accessibilityLayer
           data={filteredData}
@@ -139,7 +136,7 @@ export function ChartLineMultiple({
 
           <ChartLegend
             content={
-              <div className="grid grid-cols-4 gap-4 mt-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4 text-left">
                 {chartLegend.map((legend) => (
                   <div className="flex items-center" key={legend.id}>
                     <span

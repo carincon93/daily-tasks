@@ -22,8 +22,10 @@ const fetchTasks = async (user_id: string): Promise<Task[]> => {
               }
               user_id
               description
+              emoji
               milliseconds
               date
+              strikethrough
               is_visible
             }
           }
@@ -53,8 +55,10 @@ const createTask = async (task: Partial<Task>): Promise<Task> => {
             category_id
             user_id
             description
+            emoji
             milliseconds
             date
+            strikethrough
             is_visible
           }
         }
@@ -64,10 +68,12 @@ const createTask = async (task: Partial<Task>): Promise<Task> => {
           category_id: task.category_id,
           user_id: task.user_id,
           description: task.description,
+          emoji: task.emoji,
           milliseconds: 0,
           date: new Date(new Date().getTime() - 5 * 60 * 60 * 1000)
             .toISOString()
             .split("T")[0],
+          strikethrough: false,
           is_visible: true,
         },
       },
@@ -124,8 +130,10 @@ const updateTask = async (task: Partial<Task>): Promise<Task> => {
             }
             user_id
             description
+            emoji
             milliseconds
             date
+            strikethrough
             is_visible
           }
         }
@@ -133,13 +141,15 @@ const updateTask = async (task: Partial<Task>): Promise<Task> => {
       variables: {
         id: task.id,
         _set: {
+          category_id: task.category_id,
+          user_id: task.user_id,
           description: task.description,
+          emoji: task.emoji,
           milliseconds: task.milliseconds,
           date: task.date,
+          strikethrough: task.strikethrough,
           is_visible: task.is_visible,
-          user_id: task.user_id,
-          category_id: task.category_id,
-        }
+        },
       },
     }),
   });

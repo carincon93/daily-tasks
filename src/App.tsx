@@ -1,6 +1,5 @@
 import Tasks from "./components/tasks/tasks";
 import { Timer } from "./components/timer";
-import background from "/background.svg";
 import "./App.css";
 import ThemeToggle from "./components/ThemeToggle";
 import {
@@ -105,14 +104,7 @@ function App() {
           element={
             <>
               <ThemeToggle />
-              <img
-                id="background"
-                src={background}
-                alt="background"
-                fetchPriority="high"
-              />
-
-              <div className="h-screen p-4 space-y-4 relative z-10 dark:text-white">
+              <div className="min-h-screen p-4 space-y-4 relative z-10 dark:text-white">
                 <div className="boxes-pattern absolute size-full inset-0 -z-1"></div>
 
                 <Timer />

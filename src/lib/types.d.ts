@@ -3,9 +3,11 @@ type Task = {
   category_id: string;
   category: Category;
   user_id: string;
+  emoji?: string;
   description: string;
   milliseconds: number;
   date: string;
+  strikethrough: boolean;
   is_visible: boolean;
 };
 
