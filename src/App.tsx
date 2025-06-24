@@ -104,7 +104,7 @@ function App() {
           element={
             <>
               <ThemeToggle />
-              <div className="min-h-screen p-4 space-y-4 relative z-10 dark:text-white">
+              <div className="min-h-screen p-4 space-y-4 relative z-10 dark:text-white pb-30">
                 <div className="boxes-pattern absolute size-full inset-0 -z-1"></div>
 
                 <Timer />

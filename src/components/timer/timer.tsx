@@ -39,7 +39,7 @@ export function Timer() {
     );
 
   return (
-    <div className="flex items-center justify-center space-y-4 p-4 rounded-lg shadow-md bg-slate-300/70 backdrop-blur-2xl border-amber-400 border text-slate-800 fixed xl:bottom-0 max-xl:top-4 left-0 right-0 mx-auto z-50 w-50">
+    <div className="flex items-center justify-center space-y-4 p-4 rounded-lg shadow-md bg-slate-300/70 backdrop-blur-2xl border-amber-400 border text-slate-800 fixed bottom-0 left-0 right-0 mx-auto z-50 w-50">
       <img
         src="/daily-tasks-app/emojis/watch.png"
         alt="timer"
