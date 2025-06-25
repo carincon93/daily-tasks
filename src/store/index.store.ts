@@ -1,5 +1,9 @@
 import { Session, Task } from "@/lib/types";
-import { fetchSession, updateSession } from "@/services/tasks-graphql";
+import {
+  fetchSession,
+  updateSession,
+  updateTask,
+} from "@/services/tasks-graphql";
 import { create } from "zustand";
 
 type TimerStore = {
@@ -115,20 +119,29 @@ export const useTimerStore = create<TimerStore>((set) => {
     },
     stopTimer: async () => {
       const session = await getSession();
+      const now = Date.now();
 
       if (!session) return;
 
-      const endOfDay = endOfDayUtc5(session.start_time)?.getTime().toString();
-
-      const sessionToUpdate: Partial<Session> = {
-        id: session.id,
-        start_time: session.start_time,
-        end_of_day: Number(endOfDay),
-        task_in_process: null,
-        user_id: userId,
+      const taskToUpdate: Partial<Task> = {
+        id: session.task_in_process?.id,
+        milliseconds:
+          session.start_time !== null ? Date.now() - session.start_time : 0,
       };
 
-      updateSession(sessionToUpdate);
+      updateTask(taskToUpdate).then(() => {
+        const endOfDay = endOfDayUtc5(now)?.getTime().toString();
+
+        const sessionToUpdate: Partial<Session> = {
+          id: session.id,
+          start_time: null,
+          end_of_day: Number(endOfDay),
+          task_in_process: null,
+          user_id: userId,
+        };
+
+        updateSession(sessionToUpdate);
+      });
 
       set({ startTime: null, endOfDay: null, running: false });
     },

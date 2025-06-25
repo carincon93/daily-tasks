@@ -68,6 +68,7 @@ function Tasks() {
     emoji: "",
     category_id: "",
   });
+  const [chartData, setChartData] = useState<any[]>([]);
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
@@ -105,8 +106,7 @@ function Tasks() {
   };
 
   const handleTaskSelected = (task: Task) => {
-    if (!task || taskSelected?.id === task.id || currentDate !== task.date)
-      return;
+    if (!task || taskSelected?.id === task.id) return;
 
     if (taskSelected?.id !== task.id && startTime && taskSelected) {
       const newTaskMs = Date.now() - startTime;
@@ -132,7 +132,15 @@ function Tasks() {
   };
 
   const handleCloneTask = async (task: Task) => {
-    if (!userId || !task) return;
+    if (!userId || !task || task.date === currentDate) return;
+
+    const taskToUpdate: Partial<Task> = {
+      id: task.id,
+      milliseconds: task.milliseconds,
+      is_visible: false,
+    };
+
+    updateTask(taskToUpdate);
 
     const newTask: Partial<Task> = {
       user_id: task.user_id,
@@ -143,26 +151,7 @@ function Tasks() {
       is_visible: true,
     };
 
-    createTask(newTask).then(() => fetchTasks(userId).then(setTasks));
-
-    const taskToUpdate: Partial<Task> = {
-      id: task.id,
-      milliseconds: task.milliseconds,
-      is_visible: false,
-    };
-
-    updateTask(taskToUpdate).then(() =>
-      setTasks((prevTasks) => {
-        const updatedTasks = prevTasks
-          .sort((a, b) => b.milliseconds - a.milliseconds)
-          .map((prevTask) =>
-            prevTask.id === task.id
-              ? { ...prevTask, is_visible: false }
-              : prevTask
-          );
-        return updatedTasks;
-      })
-    );
+    createTask(newTask);
   };
 
   const strikeTroughTask = async (task: Task) => {
@@ -321,29 +310,11 @@ function Tasks() {
     setTaskSelected(taskInProcess ?? null);
 
     if (taskInProcess.date !== currentDate) {
-      if (!endOfDay || !startTime) return;
+      if (!endOfDay || !startTime || !userId) return;
 
       if (Date.now() > endOfDay) {
         stopTimer();
-
-        const taskToUpdate: Partial<Task> = {
-          id: taskInProcess.id,
-          milliseconds: endOfDay - startTime,
-          is_visible: taskInProcess.is_visible,
-        };
-
-        updateTask(taskToUpdate).then(() =>
-          setTasks((prevTasks) => {
-            const updatedTasks = prevTasks
-              .sort((a, b) => b.milliseconds - a.milliseconds)
-              .map((prevTask) =>
-                prevTask.id === taskInProcess.id
-                  ? { ...prevTask, milliseconds: endOfDay - startTime }
-                  : prevTask
-              );
-            return updatedTasks;
-          })
-        );
+        groupedTasksByCategory();
       }
     }
   }, [taskInProcess]);
@@ -354,10 +325,8 @@ function Tasks() {
     tasks
       .filter((task) => task.is_visible)
       .forEach((task) => {
-        if (task.date !== currentDate) {
-          // Handle tasks that are not from the current date
-          handleCloneTask(task);
-        }
+        // Handle tasks that are not from the current date
+        handleCloneTask(task);
       });
   }, [tasks]);
 
