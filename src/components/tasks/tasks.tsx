@@ -68,7 +68,6 @@ function Tasks() {
     emoji: "",
     category_id: "",
   });
-  const [chartData, setChartData] = useState<any[]>([]);
 
   const { startTime, endOfDay, taskInProcess, startTimer } = useTimerStore();
   const { userId } = useUserStore();
