@@ -6,6 +6,7 @@ import {
 } from "@/store/index.store";
 import {
   Check,
+  Circle,
   Eraser,
   Pencil,
   Play,
@@ -416,9 +417,21 @@ function Tasks() {
                 .map((task, index) => (
                   <li
                     key={task.id}
-                    className={`relative text-black mb-4 rounded-lg ${taskSelected?.id === task.id && 'border-amber-400 border'} ${assignTaskBackgroundColor(
-                      index
-                    )} w-full p-4`}
+                    className={`relative text-black mb-4 rounded-lg ${
+                      taskSelected?.id === task.id && "border-amber-400 border"
+                    } w-full p-4`}
+                    style={{
+                      backgroundColor: task.category.color
+                        ? `${task.category.color.replace(
+                            /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i,
+                            (m, r, g, b) =>
+                              `rgba(${parseInt(r, 16)},${parseInt(
+                                g,
+                                16
+                              )},${parseInt(b, 16)},0.3)`
+                          )}`
+                        : "",
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       <img
@@ -441,50 +454,58 @@ function Tasks() {
 
                     <div className="absolute right-2 top-0.5">
                       <div className="flex justify-center items-center gap-2">
-                        <button
-                          onClick={() => strikeTroughTask(task)}
-                          className="hover:scale-120 transition-all duration-200 mt-2"
-                        >
-                          {task.strikethrough ? (
-                            <RefreshCcw size={16} />
-                          ) : (
-                            <Check size={16} />
-                          )}
-                          {""}
-                        </button>
-
-                        {taskSelected?.id !== task.id && (
-                          <button
-                            className={`hover:scale-120 transition-all duration-200 mt-2
+                        {taskSelected?.id !== task.id ? (
+                          <>
+                            <button
+                              onClick={() => strikeTroughTask(task)}
+                              className="hover:scale-120 transition-all duration-200 mt-2"
+                            >
+                              {task.strikethrough ? (
+                                <RefreshCcw size={16} />
+                              ) : (
+                                <Check size={16} />
+                              )}
+                              {""}
+                            </button>
+                            <button
+                              className={`hover:scale-120 transition-all duration-200 mt-2
                       ${currentDate !== task.date ? "opacity-50" : ""}
                       `}
-                            style={{
-                              borderColor: task.category.color || "#fbbf24",
-                            }}
-                            onClick={() => handleTaskSelected(task)}
-                            disabled={taskSelected?.id === task.id}
-                          >
-                            <Play size={16} />
-                            {""}
-                          </button>
+                              style={{
+                                borderColor: task.category.color || "#fbbf24",
+                              }}
+                              onClick={() => handleTaskSelected(task)}
+                              disabled={taskSelected?.id === task.id}
+                            >
+                              <Play size={16} />
+                              {""}
+                            </button>
+
+                            <button
+                              onClick={() => setTaskSelectedToUpdate(task)}
+                              className="hover:scale-120 transition-all duration-200 mt-2 mr-2"
+                            >
+                              <Pencil size={16} />
+                              {""}
+                            </button>
+                            <span className="text-gray-500 translate-y-0.5 select-none">
+                              |
+                            </span>
+                            <button
+                              onClick={() => handleDeleteTask(task)}
+                              type="button"
+                              className="hover:scale-120 transition-all duration-200 ml-2 mt-2"
+                            >
+                              <Eraser size={16} />
+                              {""}
+                            </button>
+                          </>
+                        ) : (
+                          <Circle
+                            size={16}
+                            className="animate-bounce text-indigo-400 mt-2"
+                          />
                         )}
-
-                        <button
-                          onClick={() => setTaskSelectedToUpdate(task)}
-                          className="hover:scale-120 transition-all duration-200 mt-2"
-                        >
-                          <Pencil size={16} />
-                          {""}
-                        </button>
-
-                        <button
-                          onClick={() => handleDeleteTask(task)}
-                          type="button"
-                          className="hover:scale-120 transition-all duration-200 mt-2"
-                        >
-                          <Eraser size={16} />
-                          {""}
-                        </button>
                       </div>
                     </div>
                   </li>
