@@ -8,6 +8,8 @@ const emojis = [
   "/emojis/gym.png",
   "/emojis/reading.png",
   "/emojis/posture.png",
+  "/emojis/t-shirt.png",
+  "/emojis/skull.png",
 ];
 
 export { emojis };
