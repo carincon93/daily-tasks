@@ -402,7 +402,7 @@ function Tasks() {
                       backgroundColor: task.category.color
                         ? `${task.category.color.replace(
                             /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i,
-                            (r, g, b) =>
+                            (m, r, g, b) =>
                               `rgba(${parseInt(r, 16)},${parseInt(
                                 g,
                                 16
