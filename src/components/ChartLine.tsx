@@ -71,10 +71,6 @@ export function ChartLineMultiple({
   filteredData.sort((a, b) => a.date.localeCompare(b.date));
   chartLegend.sort((a, b) => a.name.localeCompare(b.name));
 
-  console.log("categories", categories);
-
-  console.log("chartLegend", chartLegend);
-
   return (
     <>
       <Select
