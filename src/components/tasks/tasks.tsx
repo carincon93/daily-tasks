@@ -313,7 +313,6 @@ function Tasks() {
 
       if (Date.now() > endOfDay) {
         stopTimer();
-        groupedTasksByCategory();
       }
     }
   }, [taskInProcess]);

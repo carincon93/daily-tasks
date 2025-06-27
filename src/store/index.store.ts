@@ -129,8 +129,10 @@ export const useTimerStore = create<TimerStore>((set) => {
           session.start_time !== null ? Date.now() - session.start_time : 0,
       };
 
-      updateTask(taskToUpdate).then(() => {
+      updateTask(taskToUpdate).then((task) => {
         const endOfDay = endOfDayUtc5(now)?.getTime().toString();
+
+        if (!task) return;
 
         const sessionToUpdate: Partial<Session> = {
           id: session.id,
@@ -140,7 +142,9 @@ export const useTimerStore = create<TimerStore>((set) => {
           user_id: userId,
         };
 
-        updateSession(sessionToUpdate);
+        setTimeout(() => {
+          updateSession(sessionToUpdate);
+        }, 1000);
       });
 
       set({ startTime: null, endOfDay: null, running: false });
