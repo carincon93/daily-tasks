@@ -3,7 +3,7 @@ const emojis = [
   "/emojis/zzz.png",
   "/emojis/dev.png",
   "/emojis/listening.png",
-  "/emojis/stretch.png",
+  "/emojis/kegel.png",
   "/emojis/bed.png",
   "/emojis/gym.png",
   "/emojis/reading.png",
