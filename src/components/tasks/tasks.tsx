@@ -379,11 +379,13 @@ function Tasks() {
             {tasks &&
               tasks
                 .filter((task) => task.is_visible)
-                .sort((a, b) => b.milliseconds - a.milliseconds)
+                .sort(
+                  (a, b) => Number(a.strikethrough) - Number(b.strikethrough)
+                )
                 .map((task) => (
                   <li
                     key={task.id}
-                    className={`relative text-black mb-4 rounded-lg ${
+                    className={`relative text-black mb-4 rounded-lg flex items-center ${
                       taskSelected?.id === task.id && "border-amber-400 border"
                     } w-full p-4`}
                     style={{
@@ -399,42 +401,50 @@ function Tasks() {
                         : "",
                     }}
                   >
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={`/daily-tasks-app${task.emoji}`}
-                        width="22"
-                        alt="Emoji"
-                      />
-                      <strong
-                        className={`${
-                          task.strikethrough ? "line-through" : ""
-                        }`}
-                      >
-                        {task.description}
-                      </strong>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={`/daily-tasks-app${task.emoji}`}
+                          width="22"
+                          alt="Emoji"
+                        />
+                        <strong
+                          className={`${
+                            task.strikethrough ? "line-through" : ""
+                          }`}
+                        >
+                          {task.description}
+                        </strong>
+                      </div>
+
+                      <span className={`text-xs block`}>
+                        {calculateTaskTime(task) || "00hr 00min"}
+                      </span>
                     </div>
 
-                    <span className={`text-xs block`}>
-                      {calculateTaskTime(task) || "00hr 00min"}
-                    </span>
-
-                    <div className="absolute right-2 top-0.5">
+                    <div className="">
                       <div className="flex justify-center items-center gap-2">
                         {taskSelected?.id !== task.id ? (
                           <>
                             <button
                               onClick={() => strikeTroughTask(task)}
-                              className="hover:scale-120 transition-all duration-200 mt-2"
+                              className={`group hover:scale-120 transition-all duration-200 -translate-x-10 rounded-full size-8 flex items-center justify-center ${
+                                task.strikethrough
+                                  ? "bg-green-500"
+                                  : "bg-slate-500"
+                              } text-white`}
                             >
-                              {task.strikethrough ? (
-                                <RefreshCcw size={16} />
-                              ) : (
-                                <Check size={16} />
-                              )}
+                              <Check
+                                size={16}
+                                className={`${
+                                  !task.strikethrough && "hidden"
+                                } group-hover:block`}
+                              />
                               {""}
                             </button>
+
                             <button
-                              className={`hover:scale-120 transition-all duration-200 mt-2 ${
+                              className={`hover:scale-120 transition-all duration-200 mr-4 ${
                                 currentDate !== task.date ? "opacity-50" : ""
                               }`}
                               style={{
@@ -449,7 +459,7 @@ function Tasks() {
 
                             <button
                               onClick={() => setTaskSelectedToUpdate(task)}
-                              className="hover:scale-120 transition-all duration-200 mt-2 mr-2"
+                              className="hover:scale-120 transition-all duration-200 mr-2"
                             >
                               <Pencil size={16} />
                               {""}
@@ -460,7 +470,7 @@ function Tasks() {
                             <button
                               onClick={() => handleDeleteTask(task)}
                               type="button"
-                              className="hover:scale-120 transition-all duration-200 ml-2 mt-2"
+                              className="hover:scale-120 transition-all duration-200 ml-2"
                             >
                               <Eraser size={16} />
                               {""}

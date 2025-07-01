@@ -69,7 +69,6 @@ export function ChartLineMultiple({
   });
 
   filteredData.sort((a, b) => a.date.localeCompare(b.date));
-  chartLegend.sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <>
@@ -138,7 +137,7 @@ export function ChartLineMultiple({
           <ChartLegend
             content={
               <div className="grid grid-cols-3 xl:grid-cols-4 gap-4 mt-4 text-left">
-                {chartLegend.map((legend) => (
+                {chartLegend.sort((a, b) => a.name.localeCompare(b.name)).map((legend) => (
                   <div className="flex items-center" key={legend.id}>
                     <span
                       style={{
