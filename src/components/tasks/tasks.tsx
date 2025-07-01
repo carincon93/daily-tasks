@@ -401,7 +401,7 @@ function Tasks() {
                           alt="Emoji"
                         />
                         <strong
-                          className={`${
+                          className={`max-xl:text-xs ${
                             task.strikethrough ? "line-through" : ""
                           }`}
                         >
@@ -419,7 +419,7 @@ function Tasks() {
                         <>
                           <button
                             onClick={() => strikeTroughTask(task)}
-                            className={`group hover:scale-120 transition-all duration-200 rounded-lg mr-2 size-6 flex items-center justify-center ${
+                            className={`group hover:scale-120 transition-all duration-200 rounded-lg mr-2 size-5 flex items-center justify-center ${
                               task.strikethrough
                                 ? "bg-green-500"
                                 : "bg-slate-300"
