@@ -326,11 +326,12 @@ function Tasks() {
     if (!taskInProcess) return;
 
     setTaskSelected(taskInProcess ?? null);
+    console.log(startTime);
 
     if (taskInProcess.date !== currentDate) {
       if (!endOfDay || !startTime || !userId) return;
 
-      if (Date.now() > endOfDay) {
+      if (Date.now() > startTime) {
         setOpenOldTaskDialog(true);
       }
     }
@@ -574,10 +575,6 @@ function Tasks() {
           </AlertDialogHeader>
 
           <AlertDialogFooter className="flex items-center gap-4">
-            <AlertDialogCancel onClick={() => setOpenOldTaskDialog(false)}>
-              Cancel
-            </AlertDialogCancel>
-
             <AlertDialogAction
               onClick={updateOldTask}
               disabled={currentDate === taskSelected?.date}
