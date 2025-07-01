@@ -426,7 +426,7 @@ function Tasks() {
                         <>
                           <button
                             onClick={() => strikeTroughTask(task)}
-                            className={`group hover:scale-120 transition-all duration-200 -translate-x-10 rounded-full size-8 flex items-center justify-center ${
+                            className={`group hover:scale-120 transition-all duration-200 md:-translate-x-10 rounded-full size-6 flex items-center justify-center ${
                               task.strikethrough
                                 ? "bg-green-500"
                                 : "bg-slate-300"
