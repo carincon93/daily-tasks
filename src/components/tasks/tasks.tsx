@@ -17,7 +17,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { ChartLineMultiple } from "@/components/ChartLine";
-import { Category, Task } from "@/lib/types";
+import { Category, Task, Session as TaskSession } from "@/lib/types";
 
 import {
   createCategory,
@@ -59,10 +59,12 @@ function Tasks() {
     color: "",
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [openOldTaskDialog, setOpenOldTaskDialog] = useState(false);
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
   const [openUpdateTaskDialog, setOpenUpdateTaskDialog] = useState(false);
   const [taskSelectedToUpdate, setTaskSelectedToUpdate] =
     useState<Task | null>();
+  const [session, setSession] = useState<TaskSession>();
   const [taskToCreate, setTaskToCreate] = useState<Partial<Task>>({
     description: "",
     emoji: "",
@@ -291,6 +293,23 @@ function Tasks() {
     });
   };
 
+  const updateOldTask = () => {
+    if (!session || !session.start_time) return;
+
+    const taskToUpdate: Partial<Task> = {
+      id: session.task_in_process?.id,
+      milliseconds: Date.now() - session.start_time,
+    };
+
+    updateTask(taskToUpdate).then(() => {
+      setOpenOldTaskDialog(false);
+    });
+
+    setTimeout(() => {
+      stopTimer();
+    }, 1000);
+  };
+
   useEffect(() => {
     if (!taskSelectedToUpdate) return;
 
@@ -312,7 +331,7 @@ function Tasks() {
       if (!endOfDay || !startTime || !userId) return;
 
       if (Date.now() > endOfDay) {
-        stopTimer();
+        setOpenOldTaskDialog(true);
       }
     }
   }, [taskInProcess]);
@@ -335,6 +354,7 @@ function Tasks() {
       if (session && session.task_in_process) {
         setTaskSelected(session.task_in_process);
         startTimer(session.task_in_process, false);
+        setSession(session);
       }
     });
 
@@ -413,9 +433,9 @@ function Tasks() {
                               {""}
                             </button>
                             <button
-                              className={`hover:scale-120 transition-all duration-200 mt-2
-                      ${currentDate !== task.date ? "opacity-50" : ""}
-                      `}
+                              className={`hover:scale-120 transition-all duration-200 mt-2 ${
+                                currentDate !== task.date ? "opacity-50" : ""
+                              }`}
                               style={{
                                 borderColor: task.category.color || "#fbbf24",
                               }}
@@ -540,6 +560,33 @@ function Tasks() {
           </form>
         </div>
       </div>
+
+      <AlertDialog open={openOldTaskDialog} onOpenChange={setOpenOldTaskDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Old task selected</AlertDialogTitle>
+            <AlertDialogDescription>
+              There is an old task selected from a previous date. You can update
+              the task with the current time.
+            </AlertDialogDescription>
+
+            <div className="flex items-center justify-center gap-2"></div>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex items-center gap-4">
+            <AlertDialogCancel onClick={() => setOpenOldTaskDialog(false)}>
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={updateOldTask}
+              disabled={currentDate === taskSelected?.date}
+            >
+              Update old task
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={openCategoryDialog}
