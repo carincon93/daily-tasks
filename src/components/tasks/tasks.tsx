@@ -6,7 +6,6 @@ import {
 } from "@/store/index.store";
 import {
   Check,
-  Circle,
   Eraser,
   Pencil,
   Play,
