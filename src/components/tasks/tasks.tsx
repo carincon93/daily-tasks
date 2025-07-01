@@ -385,7 +385,8 @@ function Tasks() {
                   <li
                     key={task.id}
                     className={`relative text-black mb-4 rounded-lg flex items-center ${
-                      taskSelected?.id === task.id && "border-amber-400 border"
+                      taskSelected?.id === task.id &&
+                      "border-amber-400 border animate-pulse"
                     } w-full p-4`}
                     style={{
                       backgroundColor: task.category.color
@@ -421,67 +422,60 @@ function Tasks() {
                       </span>
                     </div>
 
-                    <div className="">
-                      <div className="flex justify-center items-center gap-2">
-                        {taskSelected?.id !== task.id ? (
-                          <>
-                            <button
-                              onClick={() => strikeTroughTask(task)}
-                              className={`group hover:scale-120 transition-all duration-200 -translate-x-10 rounded-full size-8 flex items-center justify-center ${
-                                task.strikethrough
-                                  ? "bg-green-500"
-                                  : "bg-slate-500"
-                              } text-white`}
-                            >
-                              <Check
-                                size={16}
-                                className={`${
-                                  !task.strikethrough && "hidden"
-                                } group-hover:block`}
-                              />
-                              {""}
-                            </button>
+                    <div className="flex justify-center items-center gap-2">
+                      {taskSelected?.id !== task.id && (
+                        <>
+                          <button
+                            onClick={() => strikeTroughTask(task)}
+                            className={`group hover:scale-120 transition-all duration-200 -translate-x-10 rounded-full size-8 flex items-center justify-center ${
+                              task.strikethrough
+                                ? "bg-green-500"
+                                : "bg-slate-300"
+                            } text-white`}
+                          >
+                            <Check
+                              size={16}
+                              className={`${
+                                !task.strikethrough && "hidden"
+                              } group-hover:block`}
+                            />
+                            {""}
+                          </button>
 
-                            <button
-                              className={`hover:scale-120 transition-all duration-200 mr-4 ${
-                                currentDate !== task.date ? "opacity-50" : ""
-                              }`}
-                              style={{
-                                borderColor: task.category.color || "#fbbf24",
-                              }}
-                              onClick={() => handleTaskSelected(task)}
-                              disabled={taskSelected?.id === task.id}
-                            >
-                              <Play size={16} />
-                              {""}
-                            </button>
+                          <button
+                            className={`hover:scale-120 transition-all duration-200 mr-4 ${
+                              currentDate !== task.date ? "opacity-50" : ""
+                            }`}
+                            style={{
+                              borderColor: task.category.color || "#fbbf24",
+                            }}
+                            onClick={() => handleTaskSelected(task)}
+                            disabled={taskSelected?.id === task.id}
+                          >
+                            <Play size={16} />
+                            {""}
+                          </button>
 
-                            <button
-                              onClick={() => setTaskSelectedToUpdate(task)}
-                              className="hover:scale-120 transition-all duration-200 mr-2"
-                            >
-                              <Pencil size={16} />
-                              {""}
-                            </button>
-                            <span className="text-gray-500 translate-y-0.5 select-none">
-                              |
-                            </span>
-                            <button
-                              onClick={() => handleDeleteTask(task)}
-                              type="button"
-                              className="hover:scale-120 transition-all duration-200 ml-2"
-                            >
-                              <Eraser size={16} />
-                              {""}
-                            </button>
-                          </>
-                        ) : (
-                          <Circle
-                            size={16}
-                            className="animate-bounce text-indigo-400 mt-2"
-                          />
-                        )}
-                      </div>
+                          <button
+                            onClick={() => setTaskSelectedToUpdate(task)}
+                            className="hover:scale-120 transition-all duration-200 mr-2"
+                          >
+                            <Pencil size={16} />
+                            {""}
+                          </button>
+                          <span className="text-gray-500 translate-y-0.5 select-none">
+                            |
+                          </span>
+                          <button
+                            onClick={() => handleDeleteTask(task)}
+                            type="button"
+                            className="hover:scale-120 transition-all duration-200 ml-2"
+                          >
+                            <Eraser size={16} />
+                            {""}
+                          </button>
+                        </>
+                      )}
                     </div>
                   </li>
                 ))}
