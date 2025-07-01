@@ -419,7 +419,7 @@ function Tasks() {
                         <>
                           <button
                             onClick={() => strikeTroughTask(task)}
-                            className={`group hover:scale-120 transition-all duration-200 xl:-translate-x-8 rounded-full size-6 flex items-center justify-center ${
+                            className={`group hover:scale-120 transition-all duration-200 rounded-lg mr-2 size-6 flex items-center justify-center ${
                               task.strikethrough
                                 ? "bg-green-500"
                                 : "bg-slate-300"
@@ -435,7 +435,7 @@ function Tasks() {
                           </button>
 
                           <button
-                            className={`hover:scale-120 transition-all duration-200 mr-4 ${
+                            className={`hover:scale-120 transition-all duration-200 mr-2 ${
                               currentDate !== task.date ? "opacity-50" : ""
                             }`}
                             style={{
