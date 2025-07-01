@@ -4,14 +4,7 @@ import {
   getCurrentDate,
   stopTimer,
 } from "@/store/index.store";
-import {
-  Check,
-  Eraser,
-  Pencil,
-  Play,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Check, Eraser, Pencil, Play, Plus, Trash2 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { ChartLineMultiple } from "@/components/ChartLine";
@@ -426,7 +419,7 @@ function Tasks() {
                         <>
                           <button
                             onClick={() => strikeTroughTask(task)}
-                            className={`group hover:scale-120 transition-all duration-200 md:-translate-x-10 rounded-full size-6 flex items-center justify-center ${
+                            className={`group hover:scale-120 transition-all duration-200 xl:-translate-x-8 rounded-full size-6 flex items-center justify-center ${
                               task.strikethrough
                                 ? "bg-green-500"
                                 : "bg-slate-300"
